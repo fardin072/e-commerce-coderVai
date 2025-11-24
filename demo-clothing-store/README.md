@@ -42,6 +42,23 @@ Visit the [Quickstart Guide](https://docs.medusajs.com/learn/installation) to se
 
 Visit the [Docs](https://docs.medusajs.com/learn/installation#get-started) to learn more about our system requirements.
 
+## SSLCommerz Integration
+
+This starter now ships with sandbox-ready endpoints that wrap the officially supported [`sslcommerz-lts`](https://www.npmjs.com/package/sslcommerz-lts) SDK. To use them:
+
+1. Populate the new SSL-specific keys inside `.env` (use `.env.template` as a reference). Set `SSL_MODE=sandbox` while testing, then switch to `live` with your production store credentials. Use `SSL_RETURN_URL` to control where the shopper lands after the payment gateway redirects back to your storefront.
+2. Start the Medusa server (`npm run dev`). The following REST endpoints become available under the `/store/sslcommerz` namespace:
+   - `POST /init`: Initialize a payment and receive the `GatewayPageURL`.
+   - `POST /validate`: Validate a transaction using the `val_id` returned by SSLCommerz.
+   - `POST /initiate-refund`, `POST /refund-query`.
+   - `POST /transaction-query-by-transaction-id`, `POST /transaction-query-by-session-id`.
+   - `POST|GET /success`, `/fail`, `/cancel`, and `POST /ipn`: Callback endpoints you can register in the SSLCommerz dashboard.
+3. Point the success, fail, cancel, and IPN URLs in the SSLCommerz dashboard to the matching routes on your server (for local testing the defaults are `http://localhost:9000/store/sslcommerz/*`).
+4. Attach the `pp_sslcommerz_default` payment provider to any regions that should expose SSLCommerz at checkout. The provided seed script already links the demo region, but if you're working with existing data you can update the region in Medusa Admin under **Settings → Regions**.
+5. In the storefront checkout experience, selecting the "SSLCommerz" payment method will now create a payment session and redirect the shopper to the GatewayPageURL. After the payment is confirmed, SSLCommerz will hit the IPN/success routes which in turn authorize the Medusa payment session so the cart can be completed.
+
+Each route returns the raw SSLCommerz API payload so you can plug in any custom order or cart logic that fits your workflow. Use the `validate` route (or the automatic validation inside the success/IPN handlers) to confirm every transaction before fulfilling an order.
+
 ## What is Medusa
 
 Medusa is a set of commerce modules and tools that allow you to build rich, reliable, and performant commerce applications without reinventing core commerce logic. The modules can be customized and used to build advanced ecommerce stores, marketplaces, or any product that needs foundational commerce primitives. All modules are open-source and freely available on npm.

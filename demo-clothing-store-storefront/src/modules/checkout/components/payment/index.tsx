@@ -1,7 +1,7 @@
 "use client"
 
 import { RadioGroup } from "@headlessui/react"
-import { isStripeLike, paymentInfoMap } from "@lib/constants"
+import { isSslCommerz, isStripeLike, paymentInfoMap } from "@lib/constants"
 import { initiatePaymentSession } from "@lib/data/cart"
 import { CheckCircleSolid, CreditCard } from "@medusajs/icons"
 import { Button, Container, Heading, Text, clx } from "@medusajs/ui"
@@ -12,6 +12,7 @@ import PaymentContainer, {
 import Divider from "@modules/common/components/divider"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
+import { HttpTypes } from "@medusajs/types"
 
 const Payment = ({
   cart,
@@ -76,13 +77,42 @@ const Payment = ({
       const shouldInputCard =
         isStripeLike(selectedPaymentMethod) && !activeSession
 
+      const requiresRedirect = isSslCommerz(selectedPaymentMethod)
       const checkActiveSession =
-        activeSession?.provider_id === selectedPaymentMethod
+        !requiresRedirect && activeSession?.provider_id === selectedPaymentMethod
+
+      let paymentResponse: HttpTypes.StorePaymentCollectionResponse | undefined
 
       if (!checkActiveSession) {
-        await initiatePaymentSession(cart, {
+        paymentResponse = await initiatePaymentSession(cart, {
           provider_id: selectedPaymentMethod,
         })
+      }
+
+      if (requiresRedirect) {
+        const fallbackSessions =
+          activeSession
+            ? [activeSession]
+            : cart.payment_collection?.payment_sessions ?? []
+
+        const sessions =
+          paymentResponse?.payment_collection?.payment_sessions ??
+          fallbackSessions
+
+        const sslSession = sessions.find(
+          (session: any) => session.provider_id === selectedPaymentMethod
+        )
+
+        const gatewayUrl = sslSession?.data?.gateway_url
+
+        if (!gatewayUrl) {
+          throw new Error(
+            "Unable to retrieve SSLCommerz gateway URL. Please try again."
+          )
+        }
+
+        window.location.href = gatewayUrl
+        return
       }
 
       if (!shouldInputCard) {

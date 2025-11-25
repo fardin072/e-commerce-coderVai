@@ -12,6 +12,8 @@ BULKSMSBD_BALANCE_URL=http://bulksmsbd.net/api/getBalanceApi
 BULKSMSBD_API_KEY=<your-api-key>
 BULKSMSBD_SENDER_ID=<approved-sender-id>
 BULKSMSBD_DEFAULT_TYPE=text
+BULKSMSBD_NOTIFY_ORDER_PLACED=true
+BULKSMSBD_BRAND_NAME=Medusa Store
 ```
 
 Ensure the server IP is whitelisted inside the Bulk SMS BD dashboard.
@@ -42,4 +44,13 @@ curl -X POST http://localhost:9000/admin/sms/send \
 ```
 
 All responses bubble up the Bulk SMS BD status code (e.g., `202` on success) so callers can branch on delivery status or inspect `raw` for debugging.
+
+## Automatic order notifications
+
+The subscriber in `src/subscribers/order-placed-sms.ts` listens to the `order.placed` event and automatically sends a confirmation SMS using the shipping (or billing) phone number on the order. Customize it with:
+
+- `BULKSMSBD_NOTIFY_ORDER_PLACED=false` to turn the automation off without touching code.
+- `BULKSMSBD_BRAND_NAME=Your Store` to adjust the brand name used inside the confirmation text.
+
+Make sure your checkout flow captures a Bangladeshi phone number (e.g., `88017XXXXXXXX`) on the shipping address so the subscriber has a recipient.
 

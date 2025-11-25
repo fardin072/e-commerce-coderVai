@@ -27,27 +27,58 @@ export async function completeOrderAfterSSLCommerz(cartId: string) {
         // Step 2: If cart already completed, find the order
         if ((cart as any).completed_at) {
             console.log("[SSLCommerz] Cart already completed, finding order...")
+            console.log("[SSLCommerz] Cart data:", JSON.stringify(cart, null, 2))
 
             // Wait a moment for order to be fully created
-            await new Promise((resolve) => setTimeout(resolve, 1000))
+            await new Promise((resolve) => setTimeout(resolve, 1500))
 
-            // For logged-in users, try to get their orders
+            // Strategy 1: Check if cart has order_id in metadata or as property
+            const orderId = (cart as any).order_id || (cart as any).metadata?.order_id
+            if (orderId) {
+                console.log("[SSLCommerz] Found order_id in cart:", orderId)
+                try {
+                    const orderResponse = await sdk.store.order.retrieve(orderId, {}, headers)
+                    if (orderResponse?.order) {
+                        console.log("[SSLCommerz] Retrieved order:", orderResponse.order.id)
+                        return {
+                            success: true,
+                            order: orderResponse.order,
+                            countryCode: orderResponse.order.shipping_address?.country_code?.toLowerCase() || "bd",
+                        }
+                    }
+                } catch (e: any) {
+                    console.log("[SSLCommerz] Could not retrieve order by ID:", e?.message)
+                }
+            }
+
+            // Strategy 2: For logged-in users, get recent orders
             try {
+                console.log("[SSLCommerz] Trying to retrieve customer orders...")
                 const orders = await sdk.store.order.list(
                     {
-                        limit: 5,
+                        limit: 10,
                         order: "-created_at",
-                        fields: "+email"
+                        fields: "+email,+created_at,+shipping_address"
                     } as any,
                     headers
-                )
+                ).catch((e) => {
+                    console.log("[SSLCommerz] Order list error:", e?.message)
+                    return null
+                })
+
+                console.log("[SSLCommerz] Orders response:", orders)
 
                 // Find order matching this cart's email and recent timestamp
                 const cartEmail = (cart as any).email
-                if (orders?.orders && cartEmail) {
+                console.log("[SSLCommerz] Looking for order with email:", cartEmail)
+
+                if (orders?.orders && Array.isArray(orders.orders) && cartEmail) {
+                    console.log("[SSLCommerz] Found ${orders.orders.length} orders")
+
                     const matchingOrder = orders.orders.find((order: any) => {
                         const emailMatches = order.email === cartEmail
-                        const isRecent = (Date.now() - new Date(order.created_at).getTime()) < 120000 // 2 min
+                        const isRecent = (Date.now() - new Date(order.created_at).getTime()) < 180000 // 3 min
+                        console.log(`[SSLCommerz] Checking order ${order.id}: email=${emailMatches}, recent=${isRecent}`)
                         return emailMatches && isRecent
                     })
 
@@ -58,14 +89,16 @@ export async function completeOrderAfterSSLCommerz(cartId: string) {
                             order: matchingOrder,
                             countryCode: matchingOrder.shipping_address?.country_code?.toLowerCase() || "bd",
                         }
+                    } else {
+                        console.log("[SSLCommerz] No matching order found in list")
                     }
                 }
             } catch (e: any) {
-                console.log("[SSLCommerz] Could not retrieve orders (possibly guest):", e?.message)
+                console.log("[SSLCommerz] Could not retrieve orders:", e?.message, e?.stack)
             }
 
-            // If we can't get the order (guest checkout), still return success
-            console.log("[SSLCommerz] Order created but can't retrieve (guest checkout)")
+            // If we can't get the order, still return success
+            console.log("[SSLCommerz] Order created but can't retrieve - returning success anyway")
             return {
                 success: true,
                 alreadyCompleted: true,

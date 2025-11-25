@@ -25,7 +25,7 @@ export const getSessionIdFromRequest = (req: MedusaRequest): string | null => {
   if (querySessionId) {
     return querySessionId
   }
-  
+
   // Fallback to payload
   const payload = extractSslPayload(req)
   return getTranIdFromPayload(payload)
@@ -40,7 +40,7 @@ export const authorizeSslSession = async (
 
   // Retrieve the payment session to verify it exists and get its data
   const session = await paymentModule.retrievePaymentSession(sessionId)
-  
+
   if (!session) {
     throw new Error(`Payment session ${sessionId} not found`)
   }
@@ -111,7 +111,7 @@ export const respondWithRedirect = async (
         const sessionData = session.data as any
         cartId = sessionData?.cart_id || null
         console.log(`[SSLCommerz] Retrieved cart_id from session: ${cartId}`)
-        
+
         // If cart_id is null, log the full session data for debugging
         if (!cartId) {
           console.log(`[SSLCommerz] Full session data:`, JSON.stringify(sessionData, null, 2))

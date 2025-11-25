@@ -65,19 +65,19 @@ export default function SSLCommerzCallbackPage() {
           const result = await completeOrderAfterSSLCommerz(cartId)
 
           if (result.success && result.order) {
-            // Clear cart cookie before redirecting
-            document.cookie = "_medusa_cart_id=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+            // Clear cart cookie using server action (httpOnly cookies require server-side deletion)
+            await fetch('/api/clear-cart', { method: 'POST' }).catch(() => { })
             // Got order details - redirect to confirmation page
             router.push(`/${result.countryCode}/order/${result.order.id}/confirmed`)
           } else if (result.success && result.guestCheckout) {
             // Clear cart cookie - order created successfully
-            document.cookie = "_medusa_cart_id=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+            await fetch('/api/clear-cart', { method: 'POST' }).catch(() => { })
             // Guest checkout - order created but can't retrieve details
             // Redirect to homepage with success message
             router.push(`/?payment=success`)
           } else if (result.success && result.alreadyCompleted) {
             // Clear cart cookie
-            document.cookie = "_medusa_cart_id=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+            await fetch('/api/clear-cart', { method: 'POST' }).catch(() => { })
             // Order completed, redirect to orders page
             router.push(`/account/orders`)
           } else {

@@ -32,6 +32,7 @@ import type { Logger } from "@medusajs/framework/types"
 import crypto from "crypto"
 import { getSslCommerzClient, withDefaultTransactionData } from "../../../lib/sslcommerz"
 import { upstashRedis } from "../../../lib/redis/upstash"
+import { Modules } from "@medusajs/framework/utils"
 
 type InjectedDependencies = {
   logger: Logger
@@ -54,9 +55,12 @@ export class SSLCommerzPaymentProvider extends AbstractPaymentProvider {
 
   protected logger_: Logger
 
-  constructor({ logger }: InjectedDependencies, options: Record<string, unknown>) {
-    super({ logger }, options)
-    this.logger_ = logger
+  constructor(
+    dependencies: InjectedDependencies,
+    options: Record<string, unknown>
+  ) {
+    super(dependencies, options)
+    this.logger_ = dependencies.logger
   }
 
   static normalizeAmount(amount: BigNumberInput, currencyCode?: string) {
@@ -88,22 +92,86 @@ export class SSLCommerzPaymentProvider extends AbstractPaymentProvider {
     }
   }
 
+  /**
+   * Extracts customer data directly from cart object (best for guest checkouts)
+   */
+  protected extractCustomerDataFromCart(cart: any) {
+    this.logger_.info(`[SSLCommerz] Extracting customer data from cart: ${cart.id}`)
+
+    const billingAddress = cart.billing_address
+    const shippingAddress = cart.shipping_address
+    const address = billingAddress || shippingAddress
+
+    // Email is directly on cart table
+    const email = cart.email || "no-reply@example.com"
+
+    // Phone from address
+    let phoneNumber = billingAddress?.phone || shippingAddress?.phone || "01700000000"
+    if (!phoneNumber || typeof phoneNumber !== 'string' || phoneNumber.trim() === '') {
+      phoneNumber = "01700000000"
+    }
+
+    // Name from address
+    const firstName = billingAddress?.first_name || shippingAddress?.first_name || ""
+    const lastName = billingAddress?.last_name || shippingAddress?.last_name || ""
+    const fullName = `${firstName} ${lastName}`.trim() || billingAddress?.company || "Customer"
+
+    const customerData = {
+      cus_name: fullName,
+      cus_email: email,
+      cus_add1: billingAddress?.address_1 || shippingAddress?.address_1 || "Address Line 1",
+      cus_add2: billingAddress?.address_2 || shippingAddress?.address_2 || "",
+      cus_city: billingAddress?.city || shippingAddress?.city || "City",
+      cus_state: billingAddress?.province || shippingAddress?.province || "State",
+      cus_postcode: billingAddress?.postal_code || shippingAddress?.postal_code || "0000",
+      cus_country: (billingAddress?.country_code || shippingAddress?.country_code || "BD").toUpperCase(),
+      cus_phone: phoneNumber,
+      // Shipping address
+      ship_name: fullName,
+      ship_add1: shippingAddress?.address_1 || billingAddress?.address_1 || "Address Line 1",
+      ship_add2: shippingAddress?.address_2 || billingAddress?.address_2 || "",
+      ship_city: shippingAddress?.city || billingAddress?.city || "City",
+      ship_state: shippingAddress?.province || billingAddress?.province || "State",
+      ship_postcode: shippingAddress?.postal_code || billingAddress?.postal_code || "0000",
+      ship_country: (shippingAddress?.country_code || billingAddress?.country_code || "BD").toUpperCase(),
+    }
+
+    this.logger_.info(`[SSLCommerz] Extracted customer data from cart: ${JSON.stringify(customerData, null, 2)}`)
+    return customerData
+  }
+
+  /**
+   * Extracts customer data from context (fallback method, doesn't work well for guests)
+   */
   protected extractCustomerData(context: InitiatePaymentInput["context"]) {
     // Log the entire context for debugging
     this.logger_.info(`[SSLCommerz] Extracting customer data from context: ${JSON.stringify(context, null, 2)}`)
 
     const customer = context?.customer
-    const address = customer?.billing_address
+    
+    // For guest checkouts, billing/shipping address might be directly in context
+    const billingAddress = customer?.billing_address || (context as any)?.billing_address
+    const shippingAddress = (customer as any)?.shipping_address || (context as any)?.shipping_address
+    
+    // Use billing address as primary, fallback to shipping
+    const address = billingAddress || shippingAddress
+
+    // Extract email - check multiple locations for guest vs logged-in
+    const email = 
+      customer?.email ||
+      (context as any)?.email ||
+      billingAddress?.email ||
+      shippingAddress?.email ||
+      "no-reply@example.com"
 
     // Extract phone number with multiple fallbacks
-    // Medusa v2 might store phone in different places
     let phoneNumber =
       customer?.phone ||
       (customer as any)?.metadata?.phone ||
-      address?.phone ||
-      (address as any)?.phone_number ||
-      (context as any)?.billing_address?.phone ||
-      (context as any)?.shipping_address?.phone ||
+      billingAddress?.phone ||
+      shippingAddress?.phone ||
+      (billingAddress as any)?.phone_number ||
+      (shippingAddress as any)?.phone_number ||
       "01700000000" // Default valid BD phone format
 
     // Ensure phone is a non-empty string
@@ -111,32 +179,45 @@ export class SSLCommerzPaymentProvider extends AbstractPaymentProvider {
       phoneNumber = "01700000000"
     }
 
+    // Extract name - check both customer and address objects
+    const firstName = 
+      customer?.first_name || 
+      billingAddress?.first_name || 
+      shippingAddress?.first_name ||
+      ""
+    
+    const lastName = 
+      customer?.last_name || 
+      billingAddress?.last_name || 
+      shippingAddress?.last_name ||
+      ""
+
     const fullName =
-      `${customer?.first_name ?? ""} ${customer?.last_name ?? ""}`.trim() ||
+      `${firstName} ${lastName}`.trim() ||
       customer?.company_name ||
+      billingAddress?.company ||
+      shippingAddress?.company ||
       "Customer"
 
+    // Billing address details
     const customerData = {
       cus_name: fullName,
-      cus_email: customer?.email ?? "no-reply@example.com",
-      cus_add1: address?.address_1 ?? "Address Line 1",
-      cus_add2: address?.address_2 ?? "",
-      cus_city: address?.city ?? "City",
-      cus_state: address?.province ?? "State",
-      cus_postcode: address?.postal_code ?? "0000",
-      cus_country: address?.country_code
-        ? address.country_code.toUpperCase()
-        : "BD",
+      cus_email: email,
+      cus_add1: billingAddress?.address_1 || shippingAddress?.address_1 || "Address Line 1",
+      cus_add2: billingAddress?.address_2 || shippingAddress?.address_2 || "",
+      cus_city: billingAddress?.city || shippingAddress?.city || "City",
+      cus_state: billingAddress?.province || shippingAddress?.province || "State",
+      cus_postcode: billingAddress?.postal_code || shippingAddress?.postal_code || "0000",
+      cus_country: (billingAddress?.country_code || shippingAddress?.country_code || "BD").toUpperCase(),
       cus_phone: phoneNumber,
+      // Shipping address details (prefer shipping if available, otherwise use billing)
       ship_name: fullName,
-      ship_add1: address?.address_1 ?? "Address Line 1",
-      ship_add2: address?.address_2 ?? "",
-      ship_city: address?.city ?? "City",
-      ship_state: address?.province ?? "State",
-      ship_postcode: address?.postal_code ?? "0000",
-      ship_country: address?.country_code
-        ? address.country_code.toUpperCase()
-        : "BD",
+      ship_add1: shippingAddress?.address_1 || billingAddress?.address_1 || "Address Line 1",
+      ship_add2: shippingAddress?.address_2 || billingAddress?.address_2 || "",
+      ship_city: shippingAddress?.city || billingAddress?.city || "City",
+      ship_state: shippingAddress?.province || billingAddress?.province || "State",
+      ship_postcode: shippingAddress?.postal_code || billingAddress?.postal_code || "0000",
+      ship_country: (shippingAddress?.country_code || billingAddress?.country_code || "BD").toUpperCase(),
     }
 
     this.logger_.info(`[SSLCommerz] Extracted customer data: ${JSON.stringify(customerData, null, 2)}`)
@@ -166,6 +247,7 @@ export class SSLCommerzPaymentProvider extends AbstractPaymentProvider {
     return PaymentSessionStatus.PENDING
   }
 
+
   async initiatePayment({
     amount,
     currency_code,
@@ -177,16 +259,31 @@ export class SSLCommerzPaymentProvider extends AbstractPaymentProvider {
 
     const normalizedAmount = SSLCommerzPaymentProvider.normalizeAmount(amount, currency_code)
 
-    const customerData = this.extractCustomerData(context)
+    // Log the raw context to understand what Medusa provides
+    this.logger_.info(`[SSLCommerz] Raw context received: ${JSON.stringify(context, null, 2)}`)
+    this.logger_.info(`[SSLCommerz] Data received: ${JSON.stringify(data, null, 2)}`)
 
-    // Try to get cart ID early so we can include it in callback URLs
-    const cartId = (context as any)?.cart_id || (context as any)?.cart?.id || null
+    // Check if cart data was passed in data parameter (from storefront)
+    const cartData = (data as any)?.cart || (context as any)?.cart
+    let cartId: string | null = null
+
+    if (cartData) {
+      this.logger_.info(`[SSLCommerz] ✅ Cart data found! Cart ID: ${cartData.id}, Email: ${cartData.email}`)
+      cartId = cartData.id
+    } else {
+      this.logger_.warn(`[SSLCommerz] ⚠️ No cart data in context or data - will use defaults`)
+    }
+
+    // Extract customer data - use cart data if available, otherwise fallback
+    const customerData = cartData 
+      ? this.extractCustomerDataFromCart(cartData)
+      : this.extractCustomerData(context)
 
     const callbackOverrides = {
-      success_url: this.buildCallbackUrl(process.env.SSL_SUCCESS_URL, sessionId, cartId),
-      fail_url: this.buildCallbackUrl(process.env.SSL_FAIL_URL, sessionId, cartId),
-      cancel_url: this.buildCallbackUrl(process.env.SSL_CANCEL_URL, sessionId, cartId),
-      ipn_url: this.buildCallbackUrl(process.env.SSL_IPN_URL, sessionId, cartId),
+      success_url: this.buildCallbackUrl(process.env.SSL_SUCCESS_URL, sessionId, cartId ?? undefined),
+      fail_url: this.buildCallbackUrl(process.env.SSL_FAIL_URL, sessionId, cartId ?? undefined),
+      cancel_url: this.buildCallbackUrl(process.env.SSL_CANCEL_URL, sessionId, cartId ?? undefined),
+      ipn_url: this.buildCallbackUrl(process.env.SSL_IPN_URL, sessionId, cartId ?? undefined),
     }
 
     const payload = withDefaultTransactionData({
@@ -218,7 +315,7 @@ export class SSLCommerzPaymentProvider extends AbstractPaymentProvider {
       gateway_url: response.GatewayPageURL,
       payload,
       provider_response: response,
-      cart_id: cartId,
+      cart_id: cartId ?? undefined,
     }
 
     // Cache session data in Redis for 1 hour (3600 seconds)

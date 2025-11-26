@@ -242,8 +242,23 @@ export async function initiatePaymentSession(
     ...(await getAuthHeaders()),
   }
 
+  // Pass cart data via data.data (additional_data field)
+  // This gets passed to the payment provider's initiatePayment method
+  const enrichedData = {
+    ...data,
+    data: {
+      ...(data.data || {}),
+      cart: {
+        id: cart.id,
+        email: cart.email,
+        billing_address: cart.billing_address,
+        shipping_address: cart.shipping_address,
+      },
+    },
+  }
+
   return sdk.store.payment
-    .initiatePaymentSession(cart, data, {}, headers)
+    .initiatePaymentSession(cart, enrichedData, {}, headers)
     .then(async (resp) => {
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)

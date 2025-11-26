@@ -58,8 +58,8 @@ class UpstashRedisService {
     if (this.isConfigured && this.client) {
       try {
         const value = await this.client.get(key)
-        if (value === null) return null
-        return typeof value === 'string' ? JSON.parse(value) : value
+        if (value === null || value === undefined) return null
+        return (typeof value === 'string' ? JSON.parse(value) : value) as T
       } catch (error) {
         console.error('[Upstash] Error getting value:', error)
         // Fallback to in-memory
@@ -153,4 +153,3 @@ class UpstashRedisService {
 
 // Singleton instance
 export const upstashRedis = new UpstashRedisService()
-

@@ -131,7 +131,7 @@ export class BulkSmsBdClient {
     const url = `${this.config.balanceUrl}?${search.toString()}`
     const response = await fetch(url, { method: "GET" })
     const body = await response.text()
-    const parsed = this.parseResponse(body)
+    const parsed = this.parseResponse(body) as BulkSmsBalanceResponse
 
     // Simple heuristics: API often returns `{"current_balance":"123.00","validity":"2025-12-01"}`
     if (parsed.data && typeof parsed.data === "object") {

@@ -4,6 +4,7 @@ import type {
   MedusaResponse,
   MedusaNextFunction,
 } from "@medusajs/framework/http"
+import { enrichPaymentContext } from "./middlewares/enrich-payment-context"
 
 /**
  * Middleware to add publishable API key to SSLCommerz callback requests
@@ -56,8 +57,13 @@ async function addPublishableKeyForSslCallbacks(
 }
 
 export default defineMiddlewares({
-  // Use a regex matcher to catch all SSLCommerz callback routes
   routes: [
+    // Enrich payment session creation with cart data
+    {
+      matcher: /^\/store\/payment-collections\/[^\/]+\/payment-sessions$/,
+      middlewares: [enrichPaymentContext],
+    },
+    // Add publishable key for SSLCommerz callbacks
     {
       matcher: /^\/store\/sslcommerz\/(success|fail|cancel|ipn)/,
       middlewares: [addPublishableKeyForSslCallbacks],

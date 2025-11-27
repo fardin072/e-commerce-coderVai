@@ -9,6 +9,22 @@ const S3_HOSTNAME = process.env.MEDUSA_CLOUD_S3_HOSTNAME
 const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 
 /**
+ * Generate allowed origins for server actions
+ * Include localhost and 127.0.0.1 with common development ports
+ */
+const getAllowedOrigins = () => {
+  const ports = [3000, 3001, 8000, 8001, 64513, 63797]
+  const origins = []
+
+  ports.forEach(port => {
+    origins.push(`localhost:${port}`)
+    origins.push(`127.0.0.1:${port}`)
+  })
+
+  return origins
+}
+
+/**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
@@ -26,14 +42,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: [
-        "localhost:3000",
-        "localhost:8000",
-        "localhost:64513",
-        "127.0.0.1:3000",
-        "127.0.0.1:8000",
-        "127.0.0.1:64513",
-      ],
+      allowedOrigins: getAllowedOrigins(),
     },
   },
   images: {
@@ -57,6 +66,14 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ibb.co.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ibb.co",
       },
       {
         protocol: "https",

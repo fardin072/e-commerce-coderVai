@@ -5,9 +5,9 @@ import { listCategories, filterCategoriesWithProducts } from "@lib/data/categori
 import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CartButton from "@modules/layout/components/cart-button"
-import NavDropdown from "@modules/layout/components/nav-dropdown"
 import MobileMenu from "@modules/layout/components/mobile-menu"
 import CentralSearch from "@modules/layout/components/central-search"
+import CategoriesMenu from "@modules/layout/components/categories-menu"
 
 export default async function Nav() {
   const regions = await listRegions().then((regions: StoreRegion[]) => regions)
@@ -16,7 +16,7 @@ export default async function Nav() {
 
   return (
     <div className="sticky top-0 inset-x-0 z-50">
-      <header className="bg-white border-b border-slate-200 shadow-sm">
+      <header className="bg-white border-b border-grey-20 shadow-sm">
         <nav className="content-container">
           {/* Top Row: Logo, Search, Icons */}
           <div className="flex items-center justify-between h-16 gap-2 small:gap-4">
@@ -25,7 +25,7 @@ export default async function Nav() {
               <MobileMenu regions={regions} categories={categories} />
               <LocalizedClientLink
                 href="/"
-                className="font-bold text-lg small:text-xl tracking-tight hover:text-slate-600 transition-colors whitespace-nowrap"
+                className="font-bold text-lg small:text-xl tracking-tight hover:text-grey-60 transition-colors whitespace-nowrap"
                 data-testid="nav-store-link"
               >
                 ZAHAN
@@ -40,7 +40,7 @@ export default async function Nav() {
             {/* Right: Account + Cart */}
             <div className="flex items-center gap-2 small:gap-4 flex-shrink-0">
               <LocalizedClientLink
-                className="hidden small:flex items-center gap-2 px-3 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium"
+                className="hidden small:flex items-center gap-2 px-3 py-2 text-grey-70 hover:text-grey-90 hover:bg-grey-5 rounded-lg transition-colors text-sm font-medium"
                 href="/account"
                 data-testid="nav-account-link"
               >
@@ -60,12 +60,12 @@ export default async function Nav() {
                 <span className="hidden medium:inline">Account</span>
               </LocalizedClientLink>
 
-              <div className="h-6 w-px bg-slate-200 hidden small:block" />
+              <div className="h-6 w-px bg-grey-20 hidden small:block" />
 
               <Suspense
                 fallback={
                   <LocalizedClientLink
-                    className="flex items-center gap-2 px-3 py-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors text-sm font-medium"
+                    className="flex items-center gap-2 px-3 py-2 text-grey-70 hover:text-grey-90 hover:bg-grey-5 rounded-lg transition-colors text-sm font-medium"
                     href="/cart"
                     data-testid="nav-cart-link"
                   >
@@ -92,19 +92,13 @@ export default async function Nav() {
           </div>
 
           {/* Mobile Search Bar - Shown on very small screens */}
-          <div className="xsmall:hidden border-t border-slate-200 px-0 py-3">
+          <div className="xsmall:hidden border-t border-grey-20 px-0 py-3">
             <CentralSearch initialCategories={categories} />
           </div>
 
-          {/* Desktop Navigation Links - Second Row */}
-          <div className="hidden small:flex items-center justify-center border-t border-slate-100 h-12 gap-8">
-            <NavDropdown categories={categories} />
-            <LocalizedClientLink
-              href="/store"
-              className="text-slate-700 hover:text-slate-900 font-medium transition-colors text-sm"
-            >
-              All Products
-            </LocalizedClientLink>
+          {/* Desktop Navigation Links - Second Row with Categories */}
+          <div className="hidden small:flex items-center border-t border-grey-10 h-12 overflow-x-auto">
+            <CategoriesMenu categories={categories} />
           </div>
         </nav>
       </header>

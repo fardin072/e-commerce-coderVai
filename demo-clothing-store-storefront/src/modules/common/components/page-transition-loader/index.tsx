@@ -98,7 +98,7 @@ export default function PageTransitionLoader() {
   return (
     <>
       {/* Top Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 origin-left transition-transform duration-300 ease-out"
+      <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-black origin-left transition-transform duration-300 ease-out"
         style={{
           transform: `scaleX(${progress / 100})`,
           opacity: isVisible ? 1 : 0,
@@ -107,7 +107,7 @@ export default function PageTransitionLoader() {
 
       {/* Page Overlay - Subtle dimming */}
       <div
-        className={`fixed inset-0 z-40 bg-black/2 backdrop-blur-sm transition-opacity duration-300 pointer-events-none ${
+        className={`fixed inset-0 z-40 bg-black/5 transition-opacity duration-300 pointer-events-none ${
           isVisible ? "opacity-100" : "opacity-0"
         }`}
       />
@@ -117,10 +117,10 @@ export default function PageTransitionLoader() {
         <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
           <div className="flex flex-col items-center gap-4">
             {/* Dot Spinner */}
-            <DotSpinner size="lg" color="rgb(59, 130, 246)" />
+            <DotSpinner size="lg" color="#262626" />
 
             {/* Loading Text */}
-            <p className="text-sm font-medium text-slate-700">
+            <p className="text-sm font-medium text-grey-80">
               Loading...
             </p>
           </div>

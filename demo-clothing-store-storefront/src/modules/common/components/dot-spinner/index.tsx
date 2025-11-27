@@ -9,7 +9,7 @@ interface DotSpinnerProps {
 
 export default function DotSpinner({
   size = "md",
-  color = "rgb(59, 130, 246)",
+  color = "#262626",
 }: DotSpinnerProps) {
   const sizeMap = {
     sm: { container: "w-8 h-8", dot: "w-1.5 h-1.5" },

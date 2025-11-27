@@ -1,78 +1,136 @@
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
+"use client"
+
+import { useState, useEffect } from "react"
+
+const CAROUSEL_IMAGE = "https://i.ibb.co.com/3PZXtjJ/Screenshot-2025-11-27-at-12-42-52-AM.png"
 
 export default function HomeHero() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+  const [isAutoPlay, setIsAutoPlay] = useState(true)
+
+  const slides = [
+    CAROUSEL_IMAGE,
+    CAROUSEL_IMAGE,
+    CAROUSEL_IMAGE,
+    CAROUSEL_IMAGE,
+  ]
+
+  useEffect(() => {
+    if (!isAutoPlay) return
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [isAutoPlay, slides.length])
+
+  const goToPrevious = () => {
+    setIsAutoPlay(false)
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length)
+  }
+
+  const goToNext = () => {
+    setIsAutoPlay(false)
+    setCurrentSlide((prev) => (prev + 1) % slides.length)
+  }
+
+  const goToSlide = (index: number) => {
+    setIsAutoPlay(false)
+    setCurrentSlide(index)
+  }
+
   return (
-    <section className="relative w-full overflow-hidden bg-gradient-to-br from-white via-slate-50 to-slate-100 py-20 small:py-32">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-500/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-pink-500/5 rounded-full blur-3xl" />
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 content-container">
-        <div className="max-w-4xl">
-          <div className="space-y-6">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100/60 backdrop-blur-md rounded-full border border-orange-200 hover:bg-orange-100 transition-colors">
-              <span className="flex h-2 w-2 rounded-full bg-orange-500" />
-              <span className="text-sm font-medium text-slate-900">
-                Summer Collection Now Available
-              </span>
-            </div>
-
-            {/* Heading */}
-            <h1 className="text-4xl small:text-5xl medium:text-6xl font-bold text-slate-900 leading-tight">
-              Elevate Your{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-pink-500 to-rose-500">
-                Personal Style
-              </span>
-            </h1>
-
-            {/* Subheading */}
-            <p className="text-lg small:text-xl text-slate-600 leading-relaxed max-w-2xl">
-              Discover expertly curated collections of premium fashion and lifestyle products. From timeless classics to contemporary trends, find your perfect look today.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col small:flex-row gap-4 pt-4">
-              <LocalizedClientLink
-                href="/store"
-                className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-lg hover:shadow-2xl hover:shadow-orange-500/30 transition-all duration-300 hover:scale-105 text-base whitespace-nowrap group"
-              >
-                <span>Shop Collection</span>
-                <span className="group-hover:translate-x-1 transition-transform ml-2">→</span>
-              </LocalizedClientLink>
-              <LocalizedClientLink
-                href="/store"
-                className="inline-flex items-center justify-center px-8 py-4 bg-slate-200 backdrop-blur-md text-slate-900 font-bold rounded-lg border border-slate-300 hover:bg-slate-300 transition-all duration-300 text-base whitespace-nowrap group"
-              >
-                <span>Explore Categories</span>
-                <span className="group-hover:translate-x-1 transition-transform ml-2">→</span>
-              </LocalizedClientLink>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-slate-300">
-              <div>
-                <div className="text-2xl small:text-3xl font-bold text-slate-900">500+</div>
-                <p className="text-sm text-slate-600 mt-1">Premium Products</p>
-              </div>
-              <div>
-                <div className="text-2xl small:text-3xl font-bold text-slate-900">50K+</div>
-                <p className="text-sm text-slate-600 mt-1">Happy Customers</p>
-              </div>
-              <div>
-                <div className="text-2xl small:text-3xl font-bold text-slate-900">24/7</div>
-                <p className="text-sm text-slate-600 mt-1">Customer Support</p>
-              </div>
-            </div>
+    <section className="relative w-full max-h-[370px] h-auto bg-grey-0 overflow-hidden">
+      {/* Carousel Container */}
+      <div className="relative w-full h-[200px] xsmall:h-[250px] small:h-[300px] medium:h-[350px] lg:h-[370px]">
+        {/* Slides */}
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <img
+              src={slide}
+              alt={`Carousel slide ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
           </div>
-        </div>
-      </div>
+        ))}
 
-      {/* Bottom Fade Effect */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-200 to-transparent opacity-10" />
+        {/* Previous Button */}
+        <button
+          onClick={goToPrevious}
+          onMouseEnter={() => setIsAutoPlay(false)}
+          onMouseLeave={() => setIsAutoPlay(true)}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-grey-0/70 hover:bg-grey-0 text-grey-90 p-2 small:p-3 rounded-full transition-all duration-200 hover:shadow-lg active:scale-95"
+          aria-label="Previous slide"
+        >
+          <svg
+            className="w-5 h-5 small:w-6 small:h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+
+        {/* Next Button */}
+        <button
+          onClick={goToNext}
+          onMouseEnter={() => setIsAutoPlay(false)}
+          onMouseLeave={() => setIsAutoPlay(true)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-grey-0/70 hover:bg-grey-0 text-grey-90 p-2 small:p-3 rounded-full transition-all duration-200 hover:shadow-lg active:scale-95"
+          aria-label="Next slide"
+        >
+          <svg
+            className="w-5 h-5 small:w-6 small:h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5l7 7-7 7"
+            />
+          </svg>
+        </button>
+
+        {/* Dot Indicators */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 small:gap-3">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`transition-all duration-300 rounded-full ${
+                index === currentSlide
+                  ? "bg-grey-0 w-8 h-2 small:w-10 small:h-2.5"
+                  : "bg-grey-0/50 hover:bg-grey-0/70 w-2 h-2 small:w-2.5 small:h-2.5"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+              aria-current={index === currentSlide}
+            />
+          ))}
+        </div>
+
+        {/* Auto-play Indicator */}
+        {isAutoPlay && (
+          <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-grey-0/70 px-3 py-1 rounded-full text-xs small:text-sm text-grey-90">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            {/* <span>Auto-playing</span> */}
+          </div>
+        )}
+      </div>
     </section>
   )
 }

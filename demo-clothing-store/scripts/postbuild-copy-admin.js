@@ -3,7 +3,7 @@ const path = require("path")
 
 async function copyAdminBundle() {
   const rootDir = process.cwd()
-  const source = path.join(rootDir, ".medusa", "client")
+  const source = path.join(rootDir, ".medusa", "server", "public", "admin")
   const destination = path.join(rootDir, "public", "admin")
 
   if (!fs.existsSync(source)) {

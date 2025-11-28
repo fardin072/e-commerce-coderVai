@@ -16,7 +16,7 @@
     "build": "medusa build",
     "postbuild": "node scripts/postbuild-copy-admin.js",
     "seed": "medusa exec ./src/scripts/seed.ts",
-    "start": "medusa start",
+    "start": "cross-env NODE_ENV=production medusa start",
     "start:local": "cross-env NODE_ENV=staging medusa start",
     "dev": "medusa develop",
     "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",

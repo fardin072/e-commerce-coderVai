@@ -12,6 +12,14 @@ module.exports = defineConfig({
       jwtSecret: process.env.JWT_SECRET || "supersecret",
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
+    /**
+     * Force insecure cookies for local HTTPS-less runs. Remove/override
+     * when deploying behind HTTPS so admin sessions stay protected.
+     */
+    cookieOptions: {
+      secure: false,
+      sameSite: "lax",
+    },
     // AWS RDS requires SSL encryption
     databaseDriverOptions: {
       connection: {

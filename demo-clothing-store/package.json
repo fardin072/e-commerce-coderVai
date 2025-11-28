@@ -14,6 +14,7 @@
   ],
   "scripts": {
     "build": "medusa build",
+    "postbuild": "node scripts/postbuild-copy-admin.js",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "start": "medusa start",
     "start:local": "cross-env NODE_ENV=staging medusa start",

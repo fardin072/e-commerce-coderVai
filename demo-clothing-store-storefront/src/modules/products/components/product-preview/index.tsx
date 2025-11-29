@@ -221,27 +221,25 @@ export default function ProductPreview({
         )}
       </div>
 
-      {/* Discount Badge - Red Theme - Responsive */}
-      <div className="absolute -top-1 -right-1 small:-top-2 small:-right-2 z-30">
-        <div className="relative">
-          <div className={`w-12 h-12 small:w-16 small:h-16 rounded-full flex items-center justify-center shadow-xl border-2 border-white transform hover:scale-110 transition-transform ${
-            discountPercentage > 0
-              ? 'bg-gradient-to-br from-red-500 via-red-600 to-red-700 rotate-12'
-              : 'bg-gradient-to-br from-red-400 to-red-500'
-          }`}>
-            <div className={`text-center ${discountPercentage > 0 ? 'transform -rotate-12' : ''}`}>
-              <div className="text-white font-black leading-tight drop-shadow-lg" style={{ fontSize: '1.2em' }}>
-                {discountPercentage}%
-              </div>
-              <div className="text-white text-xs font-bold tracking-widest" style={{ fontSize: '0.65em' }}>
-                {discountPercentage > 0 ? 'OFF' : 'SALE'}
+      {/* Discount Badge - show only when there is a real discount */}
+      {hasDiscount && (
+        <div className="absolute -top-1 -right-1 small:-top-2 small:-right-2 z-30">
+          <div className="relative">
+            <div className="w-12 h-12 small:w-16 small:h-16 rounded-full flex items-center justify-center shadow-xl border-2 border-white transform hover:scale-110 transition-transform bg-gradient-to-br from-red-500 via-red-600 to-red-700 rotate-12">
+              <div className="text-center transform -rotate-12">
+                <div className="text-white font-black leading-tight drop-shadow-lg" style={{ fontSize: '1.2em' }}>
+                  {discountPercentage}%
+                </div>
+                <div className="text-white text-xs font-bold tracking-widest" style={{ fontSize: '0.65em' }}>
+                  OFF
+                </div>
               </div>
             </div>
+            {/* Shine Effect */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent pointer-events-none"></div>
           </div>
-          {/* Shine Effect */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent pointer-events-none"></div>
         </div>
-      </div>
+      )}
 
       {/* Content Container */}
       <div className="flex flex-col flex-1 p-2 small:p-3 medium:p-4">
@@ -267,21 +265,26 @@ export default function ProductPreview({
             </span>
           </div>
 
-          {/* Base Price (strikethrough) */}
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-600">Base Price:</span>
-            <span className="text-xs font-semibold text-slate-400 line-through">
-              {formattedBasePrice}
-            </span>
-          </div>
+          {/* Show base price and discount only when there is a real discount */}
+          {hasDiscount && (
+            <>
+              {/* Base Price (strikethrough) */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-600">Base Price:</span>
+                <span className="text-xs font-semibold text-slate-400 line-through">
+                  {formattedBasePrice}
+                </span>
+              </div>
 
-          {/* Discount Percentage */}
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-600">Discount:</span>
-            <span className={`text-xs font-semibold ${discountPercentage > 0 ? 'text-red-600' : 'text-slate-500'}`}>
-              {discountPercentage}%
-            </span>
-          </div>
+              {/* Discount Percentage */}
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-600">Discount:</span>
+                <span className="text-xs font-semibold text-red-600">
+                  {discountPercentage}%
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Variant Options - Only show if product has multiple variants */}

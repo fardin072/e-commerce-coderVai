@@ -21,11 +21,18 @@ export default function ProductPrice({
     return <div className="block w-32 h-9 bg-gray-100 animate-pulse" />
   }
 
+  const hasValidDiscount =
+    selectedPrice.price_type === "sale" &&
+    typeof selectedPrice.percentage_diff !== "undefined" &&
+    Number(selectedPrice.percentage_diff) > 0 &&
+    selectedPrice.original_price_number >
+      selectedPrice.calculated_price_number
+
   return (
     <div className="flex flex-col text-ui-fg-base">
       <span
         className={clx("text-xl-semi", {
-          "text-ui-fg-interactive": selectedPrice.price_type === "sale",
+          "text-ui-fg-interactive": hasValidDiscount,
         })}
       >
         {!variant && "From "}
@@ -36,7 +43,7 @@ export default function ProductPrice({
           {selectedPrice.calculated_price}
         </span>
       </span>
-      {selectedPrice.price_type === "sale" && (
+      {hasValidDiscount && (
         <>
           <p>
             <span className="text-ui-fg-subtle">Original: </span>

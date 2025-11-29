@@ -56,17 +56,24 @@ function getImagesForVariant(
   product: HttpTypes.StoreProduct,
   selectedVariantId?: string
 ) {
+  // Fallback to empty array if the product has no images
+  if (!product?.images || product.images.length === 0) {
+    return []
+  }
+
   if (!selectedVariantId || !product.variants) {
     return product.images
   }
 
-  const variant = product.variants!.find((v) => v.id === selectedVariantId)
-  if (!variant || !variant.images.length) {
+  const variant = product.variants.find((v) => v.id === selectedVariantId)
+
+  // If the variant has no specific images, fall back to all product images
+  if (!variant || !variant.images || variant.images.length === 0) {
     return product.images
   }
 
   const imageIdsMap = new Map(variant.images.map((i) => [i.id, true]))
-  return product.images!.filter((i) => imageIdsMap.has(i.id))
+  return product.images.filter((i) => imageIdsMap.has(i.id))
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
@@ -114,11 +121,11 @@ export default async function ProductPage(props: Props) {
     queryParams: { handle: params.handle },
   }).then(({ response }) => response.products[0])
 
-  const images = getImagesForVariant(pricedProduct, selectedVariantId)
-
   if (!pricedProduct) {
     notFound()
   }
+
+  const images = getImagesForVariant(pricedProduct, selectedVariantId)
 
   return (
     <ProductTemplate

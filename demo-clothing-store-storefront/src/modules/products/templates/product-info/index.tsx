@@ -124,3 +124,4 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   )
 }
 
+export default ProductInfo

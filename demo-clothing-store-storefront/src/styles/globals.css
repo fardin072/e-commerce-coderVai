@@ -3,6 +3,13 @@
 @import "tailwindcss/utilities";
 
 @layer base {
+  body, html, main {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@layer base {
   @keyframes fade-in-up {
     from {
       opacity: 0;
@@ -294,7 +301,7 @@
 
 @layer components {
   .content-container {
-    @apply max-w-[1440px] w-full mx-auto px-6;
+    @apply max-w-[1440px] w-full mx-auto px-4 small:px-6;
   }
 
   .contrast-btn {

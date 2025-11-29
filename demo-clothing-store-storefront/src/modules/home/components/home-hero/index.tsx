@@ -41,9 +41,9 @@ export default function HomeHero() {
   }
 
   return (
-    <section className="relative w-full max-h-[370px] h-auto bg-grey-0 overflow-hidden">
+    <section className="relative w-full bg-grey-0 overflow-hidden">
       {/* Carousel Container */}
-      <div className="relative w-full h-[200px] xsmall:h-[250px] small:h-[300px] medium:h-[350px] lg:h-[370px]">
+      <div className="relative w-full h-[180px] xsmall:h-[220px] small:h-[280px] medium:h-[330px] large:h-[370px]">
         {/* Slides */}
         {slides.map((slide, index) => (
           <div
@@ -65,11 +65,11 @@ export default function HomeHero() {
           onClick={goToPrevious}
           onMouseEnter={() => setIsAutoPlay(false)}
           onMouseLeave={() => setIsAutoPlay(true)}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-grey-0/70 hover:bg-grey-0 text-grey-90 p-2 small:p-3 rounded-full transition-all duration-200 hover:shadow-lg active:scale-95"
+          className="absolute left-2 xsmall:left-3 small:left-4 top-1/2 -translate-y-1/2 z-20 bg-grey-0/70 hover:bg-grey-0 text-grey-90 p-1.5 xsmall:p-2 small:p-3 rounded-full transition-all duration-200 hover:shadow-lg active:scale-95"
           aria-label="Previous slide"
         >
           <svg
-            className="w-5 h-5 small:w-6 small:h-6"
+            className="w-4 h-4 xsmall:w-5 xsmall:h-5 small:w-6 small:h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -88,11 +88,11 @@ export default function HomeHero() {
           onClick={goToNext}
           onMouseEnter={() => setIsAutoPlay(false)}
           onMouseLeave={() => setIsAutoPlay(true)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-grey-0/70 hover:bg-grey-0 text-grey-90 p-2 small:p-3 rounded-full transition-all duration-200 hover:shadow-lg active:scale-95"
+          className="absolute right-2 xsmall:right-3 small:right-4 top-1/2 -translate-y-1/2 z-20 bg-grey-0/70 hover:bg-grey-0 text-grey-90 p-1.5 xsmall:p-2 small:p-3 rounded-full transition-all duration-200 hover:shadow-lg active:scale-95"
           aria-label="Next slide"
         >
           <svg
-            className="w-5 h-5 small:w-6 small:h-6"
+            className="w-4 h-4 xsmall:w-5 xsmall:h-5 small:w-6 small:h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -107,15 +107,15 @@ export default function HomeHero() {
         </button>
 
         {/* Dot Indicators */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2 small:gap-3">
+        <div className="absolute bottom-2 xsmall:bottom-3 small:bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-1.5 small:gap-2">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={`transition-all duration-300 rounded-full ${
                 index === currentSlide
-                  ? "bg-grey-0 w-8 h-2 small:w-10 small:h-2.5"
-                  : "bg-grey-0/50 hover:bg-grey-0/70 w-2 h-2 small:w-2.5 small:h-2.5"
+                  ? "bg-grey-0 w-6 h-1.5 xsmall:w-8 xsmall:h-2 small:w-10 small:h-2.5"
+                  : "bg-grey-0/50 hover:bg-grey-0/70 w-1.5 h-1.5 xsmall:w-2 xsmall:h-2 small:w-2.5 small:h-2.5"
               }`}
               aria-label={`Go to slide ${index + 1}`}
               aria-current={index === currentSlide}
@@ -125,9 +125,8 @@ export default function HomeHero() {
 
         {/* Auto-play Indicator */}
         {isAutoPlay && (
-          <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-grey-0/70 px-3 py-1 rounded-full text-xs small:text-sm text-grey-90">
+          <div className="absolute top-2 xsmall:top-3 small:top-4 right-2 xsmall:right-3 small:right-4 z-20 hidden xsmall:flex items-center gap-2 bg-grey-0/70 px-2 xsmall:px-3 py-1 rounded-full text-xs small:text-sm text-grey-90">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-            {/* <span>Auto-playing</span> */}
           </div>
         )}
       </div>

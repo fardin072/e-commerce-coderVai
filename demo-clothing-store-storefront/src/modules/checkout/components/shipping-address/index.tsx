@@ -110,7 +110,7 @@ const ShippingAddress = ({
           />
         </Container>
       )}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 small:grid-cols-2 gap-3 small:gap-4">
         <Input
           label="First name"
           name="shipping_address.first_name"
@@ -129,23 +129,25 @@ const ShippingAddress = ({
           required
           data-testid="shipping-last-name-input"
         />
-        <Input
-          label="Address"
-          name="shipping_address.address_1"
-          autoComplete="address-line1"
-          value={formData["shipping_address.address_1"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-address-input"
-        />
-        <Input
-          label="Company"
-          name="shipping_address.company"
-          value={formData["shipping_address.company"]}
-          onChange={handleChange}
-          autoComplete="organization"
-          data-testid="shipping-company-input"
-        />
+        <div className="grid grid-cols-1 small:grid-cols-2 gap-3 small:gap-4 col-span-1 small:col-span-2">
+          <Input
+            label="Address"
+            name="shipping_address.address_1"
+            autoComplete="address-line1"
+            value={formData["shipping_address.address_1"]}
+            onChange={handleChange}
+            required
+            data-testid="shipping-address-input"
+          />
+          <Input
+            label="Company"
+            name="shipping_address.company"
+            value={formData["shipping_address.company"]}
+            onChange={handleChange}
+            autoComplete="organization"
+            data-testid="shipping-company-input"
+          />
+        </div>
         <Input
           label="Postal code"
           name="shipping_address.postal_code"
@@ -191,7 +193,7 @@ const ShippingAddress = ({
           data-testid="billing-address-checkbox"
         />
       </div>
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 small:grid-cols-2 gap-3 small:gap-4 mb-4">
         <Input
           label="Email"
           name="email"

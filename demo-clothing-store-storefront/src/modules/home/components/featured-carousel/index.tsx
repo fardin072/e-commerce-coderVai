@@ -62,12 +62,12 @@ export default function FeaturedCarousel({
       <div className="content-container">
         <div className="flex flex-col gap-8">
           {/* Header */}
-          <div className="flex flex-col small:flex-row small:items-center small:justify-between gap-4">
+          <div className="flex flex-col small:flex-row small:items-center small:justify-between gap-3 small:gap-4">
             <div>
-              <h2 className="text-2xl small:text-3xl font-bold text-slate-900">
+              <h2 className="text-xl xsmall:text-2xl small:text-3xl font-bold text-slate-900">
                 {title}
               </h2>
-              <p className="text-slate-600 text-sm mt-2">
+              <p className="text-slate-600 text-xs xsmall:text-sm mt-2">
                 Scroll to explore our best-selling items
               </p>
             </div>
@@ -79,10 +79,10 @@ export default function FeaturedCarousel({
             {canScrollLeft && (
               <button
                 onClick={() => scroll("left")}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-2 small:p-3 bg-white border border-slate-200 text-slate-900 rounded-full hover:bg-slate-50 shadow-md transition-all duration-300"
+                className="absolute -left-2 xsmall:-left-1 small:left-0 top-1/2 transform -translate-y-1/2 z-10 p-1.5 xsmall:p-2 small:p-3 bg-white border border-slate-200 text-slate-900 rounded-full hover:bg-slate-50 shadow-md transition-all duration-300"
                 aria-label="Scroll left"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 xsmall:w-5 xsmall:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -96,7 +96,7 @@ export default function FeaturedCarousel({
             {/* Products Carousel */}
             <div
               ref={scrollContainerRef}
-              className="flex overflow-x-auto gap-4 small:gap-6 pb-4 scroll-smooth no-scrollbar"
+              className="flex overflow-x-auto gap-4 small:gap-5 medium:gap-6 pb-4 scroll-smooth no-scrollbar"
             >
               {products.map((product) => (
                 <div
@@ -112,10 +112,10 @@ export default function FeaturedCarousel({
             {canScrollRight && (
               <button
                 onClick={() => scroll("right")}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-2 small:p-3 bg-white border border-slate-200 text-slate-900 rounded-full hover:bg-slate-50 shadow-md transition-all duration-300"
+                className="absolute -right-2 xsmall:-right-1 small:right-0 top-1/2 transform -translate-y-1/2 z-10 p-1.5 xsmall:p-2 small:p-3 bg-white border border-slate-200 text-slate-900 rounded-full hover:bg-slate-50 shadow-md transition-all duration-300"
                 aria-label="Scroll right"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 xsmall:w-5 xsmall:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"

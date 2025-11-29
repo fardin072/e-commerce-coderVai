@@ -33,24 +33,24 @@ export default async function FeaturedProductsShowcase({
   )
 
   return (
-    <div className="w-full bg-white py-16 small:py-24">
+    <div className="w-full bg-white py-12 small:py-16 medium:py-24">
       <div className="content-container">
-        <div className="flex flex-col gap-16">
+        <div className="flex flex-col gap-8 small:gap-12 medium:gap-16">
           {collectionWithProducts.map((collection, index) => (
             <div key={collection.id} className="flex flex-col gap-8">
               {/* Header */}
-              <div className="flex flex-col small:flex-row small:items-center small:justify-between gap-4 small:gap-0">
-                <div className="flex flex-col gap-2">
-                  <h3 className="text-2xl small:text-3xl font-bold text-slate-900">
+              <div className="flex flex-col small:flex-row small:items-center small:justify-between gap-3 small:gap-0">
+                <div className="flex flex-col gap-1 small:gap-2">
+                  <h3 className="text-lg xsmall:text-2xl small:text-3xl font-bold text-slate-900">
                     {collection.title}
                   </h3>
-                  <p className="text-slate-600 text-sm">
+                  <p className="text-slate-600 text-xs xsmall:text-sm">
                     Handpicked collection just for you
                   </p>
                 </div>
                 <InteractiveLink
                   href={`/collections/${collection.handle}`}
-                  className="inline-flex items-center gap-2 text-slate-900 hover:text-slate-600 font-semibold text-sm group transition-colors w-fit"
+                  className="inline-flex items-center gap-2 text-slate-900 hover:text-slate-600 font-semibold text-xs xsmall:text-sm group transition-colors w-fit"
                 >
                   View Collection
                   <span className="group-hover:translate-x-1 transition-transform inline-block">→</span>
@@ -59,7 +59,7 @@ export default async function FeaturedProductsShowcase({
 
               {/* Products Grid */}
               {collection.products && collection.products.length > 0 ? (
-                <div className="grid grid-cols-2 small:grid-cols-4 gap-4 small:gap-6">
+                <div className="grid grid-cols-2 small:grid-cols-3 medium:grid-cols-4 gap-3 small:gap-4 medium:gap-5 large:gap-6">
                   {collection.products.map((product) => (
                     <div
                       key={product.id}
@@ -83,7 +83,7 @@ export default async function FeaturedProductsShowcase({
 
               {/* Divider between collections */}
               {index < collectionWithProducts.length - 1 && (
-                <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+                <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-6 small:my-8 medium:my-12" />
               )}
             </div>
           ))}

@@ -51,7 +51,7 @@ export default async function CategoryShowcase({
 
           {/* Category Grid - Responsive */}
           <div className="w-full">
-            <div className="grid grid-cols-1 xsmall:grid-cols-2 small:grid-cols-3 gap-4 xsmall:gap-6 small:gap-8">
+            <div className="grid grid-cols-1 xsmall:grid-cols-2 small:grid-cols-3 gap-3 xsmall:gap-5 small:gap-6 medium:gap-8">
               {topLevelCategories.map((category) => {
                 const currentImage = getRandomImage(imageIndex++)
                 return (
@@ -138,8 +138,8 @@ export default async function CategoryShowcase({
           </div>
 
           {/* Featured Products Row Section */}
-          <div className="w-full pt-8 xsmall:pt-12 small:pt-16 mt-8 border-t border-grey-20">
-            <h2 className="text-2xl xsmall:text-3xl small:text-4xl font-bold text-grey-90 mb-6 xsmall:mb-8">
+          <div className="w-full pt-6 xsmall:pt-8 small:pt-12 medium:pt-16 mt-6 xsmall:mt-8 border-t border-grey-20">
+            <h2 className="text-xl xsmall:text-2xl small:text-3xl medium:text-4xl font-bold text-grey-90 mb-4 xsmall:mb-6 small:mb-8">
               Featured Products
             </h2>
             <AllProductsRow countryCode={countryCode} />
@@ -173,7 +173,7 @@ async function CategoryProductSection({
   return (
     <div className="w-full flex flex-col">
       {/* Category Title - Visible on all devices */}
-      <h3 className="text-xl xsmall:text-2xl small:text-3xl font-bold text-grey-90 mb-4 xsmall:mb-6">
+      <h3 className="text-lg xsmall:text-xl small:text-2xl medium:text-3xl font-bold text-grey-90 mb-3 xsmall:mb-4 small:mb-6">
         {category.name}
       </h3>
 
@@ -236,9 +236,9 @@ async function AllProductsRow({
 
   return (
     <div
-      className="grid gap-4 w-full"
+      className="grid gap-3 small:gap-4 w-full"
       style={{
-        gridTemplateColumns: "repeat(auto-fit, minmax(192px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
         gridAutoRows: "auto",
       }}
     >

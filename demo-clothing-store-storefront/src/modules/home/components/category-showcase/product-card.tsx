@@ -32,12 +32,8 @@ function ProductCardWithPrice({
   return (
     <LocalizedClientLink
       href={`/products/${product.handle}`}
-      className="group relative flex flex-col w-48 h-48 max-w-xs max-h-xs rounded-lg overflow-visible shadow-sm hover:shadow-lg transition-all duration-300"
+      className="group relative flex flex-col w-40 h-40 small:w-56 small:h-56 rounded-lg overflow-visible shadow-sm hover:shadow-lg transition-all duration-300"
       style={{
-        width: "192px",
-        height: "192px",
-        maxWidth: "192px",
-        maxHeight: "192px",
         aspectRatio: "1 / 1",
       }}
     >
@@ -56,13 +52,15 @@ function ProductCardWithPrice({
           </div>
         )}
 
-        {/* Discount Circle Badge - Top Right, 4px outside card */}
-        <div className="absolute -top-1 -right-1 w-12 h-12 bg-red-500 rounded-full flex items-center justify-center shadow-lg z-20">
-          <span className="text-white font-bold text-sm text-center">
-            {discountPercent}%<br />
-            <span className="text-xs">off</span>
-          </span>
-        </div>
+        {/* Discount Circle Badge - Top Right with overflow visible */}
+        {discountPercent > 0 && (
+          <div className="absolute top-1 right-0 transform translate-x-1/4 -translate-y-1/4 w-12 h-12 small:w-16 small:h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg z-20 border-2 border-white">
+            <span className="text-white font-bold text-sm small:text-base text-center leading-tight">
+              {discountPercent}%<br />
+              <span className="text-xs small:text-sm">off</span>
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Bottom Box - White box with xs shadow, positioned -2px from bottom */}

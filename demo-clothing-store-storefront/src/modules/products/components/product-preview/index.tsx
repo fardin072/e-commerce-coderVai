@@ -223,14 +223,14 @@ export default function ProductPreview({
 
       {/* Discount Badge - show only when there is a real discount */}
       {hasDiscount && (
-        <div className="absolute -top-1 -right-1 small:-top-2 small:-right-2 z-30">
+        <div className="absolute top-2 right-2 small:top-3 small:right-3 z-30">
           <div className="relative">
-            <div className="w-12 h-12 small:w-16 small:h-16 rounded-full flex items-center justify-center shadow-xl border-2 border-white transform hover:scale-110 transition-transform bg-gradient-to-br from-red-500 via-red-600 to-red-700 rotate-12">
-              <div className="text-center transform -rotate-12">
-                <div className="text-white font-black leading-tight drop-shadow-lg" style={{ fontSize: '1.2em' }}>
+            <div className="w-12 h-12 small:w-16 small:h-16 rounded-full flex items-center justify-center shadow-xl border-2 border-white transform hover:scale-110 transition-transform bg-gradient-to-br from-red-500 via-red-600 to-red-700">
+              <div className="text-center">
+                <div className="text-white font-black leading-tight drop-shadow-lg text-sm small:text-base">
                   {discountPercentage}%
                 </div>
-                <div className="text-white text-xs font-bold tracking-widest" style={{ fontSize: '0.65em' }}>
+                <div className="text-white text-xs font-bold tracking-widest">
                   OFF
                 </div>
               </div>

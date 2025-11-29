@@ -216,7 +216,7 @@ export default function ProductActions({
         {/* Action Buttons */}
         <div className="flex flex-col gap-3 pt-2">
           {/* Add to Cart Button */}
-          <LoadingButton
+          <Button
             onClick={handleAddToCart}
             disabled={
               !inStock ||
@@ -235,7 +235,7 @@ export default function ProductActions({
               : !inStock || !isValidVariant
               ? "Out of stock"
               : "Add to Cart"}
-          </LoadingButton>
+          </Button>
 
           {/* Buy Now Button */}
           <Button

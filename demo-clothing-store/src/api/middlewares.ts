@@ -56,8 +56,54 @@ async function addPublishableKeyForSslCallbacks(
   next()
 }
 
+/**
+ * Middleware to intercept logout and redirect to custom admin
+ * This runs BEFORE authentication, so it can handle logout even if session is invalid
+ */
+async function handleLogoutRedirect(
+  req: MedusaRequest,
+  res: MedusaResponse,
+  next: MedusaNextFunction
+) {
+  // Check if this is a DELETE request to /auth/session (logout)
+  // Match both with and without query params
+  const urlPath = req.url?.split("?")[0] || req.url || ""
+  if (req.method === "DELETE" && (urlPath === "/auth/session" || urlPath.endsWith("/auth/session"))) {
+    console.log("[Logout Middleware] Intercepting logout request")
+    
+    // Destroy session and redirect
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("[Logout Middleware] Failed to destroy session:", err)
+        return res.status(500).json({ message: "Failed to logout" })
+      }
+      
+      console.log("[Logout Middleware] Session destroyed, redirecting")
+      const customAdminUrl = process.env.CUSTOM_ADMIN_URL || "http://localhost:5173"
+      
+      // Set CORS headers
+      const origin = req.headers.origin || "http://localhost:9000"
+      res.setHeader("Access-Control-Allow-Origin", origin)
+      res.setHeader("Access-Control-Allow-Credentials", "true")
+      
+      // Use 303 redirect - browser will follow it
+      res.redirect(303, customAdminUrl)
+      return
+    })
+    return // Don't call next() - we've handled the request
+  }
+  
+  // For all other requests, continue to next middleware
+  next()
+}
+
 export default defineMiddlewares({
   routes: [
+    // Handle logout redirect to custom admin
+    {
+      matcher: /^\/auth\/session$/,
+      middlewares: [handleLogoutRedirect],
+    },
     // Enrich payment session creation with cart data
     {
       matcher: /^\/store\/payment-collections\/[^\/]+\/payment-sessions$/,

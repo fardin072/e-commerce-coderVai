@@ -17,18 +17,18 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
       label: "Description",
       component: <ProductDescriptionTab product={product} />,
     },
-    {
-      label: "Specifications",
-      component: <SpecificationsTab product={product} />,
-    },
-    {
-      label: "Customer Reviews",
-      component: <ReviewsTab />,
-    },
-    {
-      label: "Shipping & Returns",
-      component: <ShippingInfoTab />,
-    },
+    // {
+    //   label: "Specifications",
+    //   component: <SpecificationsTab product={product} />,
+    // },
+    // {
+    //   label: "Customer Reviews",
+    //   component: <ReviewsTab />,
+    // },
+    // {
+    //   label: "Shipping & Returns",
+    //   component: <ShippingInfoTab />,
+    // },
   ]
 
   return (

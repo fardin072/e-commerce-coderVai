@@ -95,7 +95,7 @@ const Hero = () => {
           <div className="flex flex-wrap justify-center gap-4 small:gap-6 pt-4 animate-fade-in-up animation-delay-400">
             <div className="flex items-center gap-2 text-white">
               <span className="text-lg">🚀</span>
-              <span className="text-sm font-medium">Free Shipping</span>
+              <span className="text-sm font-medium">Fast Shipping</span>
             </div>
             <div className="flex items-center gap-2 text-white">
               <span className="text-lg">🛡️</span>

@@ -48,14 +48,6 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         )}
       </div>
 
-      {/* Rating and Reviews */}
-      <div className="flex items-center gap-2 pb-4 border-b border-slate-200">
-        <ProductRating averageRating={4.5} reviewCount={24} />
-        <span className="text-xs text-slate-500">
-          {inStock ? "✓ In Stock" : "Out of Stock"}
-        </span>
-      </div>
-
       {/* Price Display - Compact */}
       <div className="flex items-baseline gap-3">
         <div className="text-2xl small:text-3xl font-bold text-slate-900">
@@ -121,15 +113,14 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
       <div className="flex flex-col gap-2 pt-2 border-t border-slate-200 text-xs text-slate-600">
         <div className="flex items-center gap-2">
           <span className="text-green-600 font-bold">✓</span>
-          <span>Free Shipping</span>
+          <span>Fast Shipping</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-green-600 font-bold">✓</span>
-          <span>30-day Returns</span>
+          <span>Safe Shoping</span>
         </div>
       </div>
     </div>
   )
 }
 
-export default ProductInfo

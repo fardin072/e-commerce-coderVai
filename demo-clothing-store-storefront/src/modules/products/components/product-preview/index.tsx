@@ -321,15 +321,6 @@ export default function ProductPreview({
           </div>
         )}
 
-        {/* Rating */}
-        <div className="flex items-center justify-center py-2 border-t border-b border-slate-200">
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-semibold text-slate-900">4.5</span>
-            <span className="text-yellow-400">★</span>
-            <span className="text-xs text-slate-500">(24 reviews)</span>
-          </div>
-        </div>
-
         {/* Add to Cart Button - Always at bottom */}
         <div className="mt-auto pt-3">
           <button

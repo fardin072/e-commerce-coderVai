@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { Button } from "@medusajs/ui"
+import { Button, clx } from "@medusajs/ui"
 import DotSpinner from "@modules/common/components/dot-spinner"
 
 interface LoadingButtonProps
@@ -20,6 +20,7 @@ export default function LoadingButton({
   size = "base",
   children,
   disabled,
+  className,
   ...props
 }: LoadingButtonProps) {
   const isDisabled = disabled || isLoading
@@ -30,7 +31,7 @@ export default function LoadingButton({
       variant={variant}
       size={size}
       disabled={isDisabled}
-      className="relative"
+      className={clx("relative", className)}
     >
       {isLoading ? (
         <div className="flex items-center justify-center gap-2">

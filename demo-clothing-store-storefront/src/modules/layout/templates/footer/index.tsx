@@ -38,10 +38,10 @@ export default async function Footer() {
                   .map((c) => (
                     <li key={c.id}>
                       <LocalizedClientLink
-                      href={`/categories/${c.handle}`}
-                      className="text-grey-50 hover:text-grey-0 transition-colors text-sm"
-                      data-testid="category-link"
-                    >
+                        href={`/categories/${c.handle}`}
+                        className="text-grey-50 hover:text-grey-0 transition-colors text-sm"
+                        data-testid="category-link"
+                      >
                         {c.name}
                       </LocalizedClientLink>
                     </li>
@@ -82,28 +82,28 @@ export default async function Footer() {
                 </LocalizedClientLink>
               </li>
               <li>
-                <a
-                  href="mailto:support@zahan.com"
+                <LocalizedClientLink
+                  href="/contact"
                   className="text-grey-50 hover:text-grey-0 transition-colors text-sm"
                 >
                   Contact Us
-                </a>
+                </LocalizedClientLink>
               </li>
               <li>
-                <a
-                  href="#"
+                <LocalizedClientLink
+                  href="/shipping-info"
                   className="text-grey-50 hover:text-grey-0 transition-colors text-sm"
                 >
                   Shipping Info
-                </a>
+                </LocalizedClientLink>
               </li>
               <li>
-                <a
-                  href="#"
+                <LocalizedClientLink
+                  href="/returns"
                   className="text-grey-50 hover:text-grey-0 transition-colors text-sm"
                 >
                   Returns
-                </a>
+                </LocalizedClientLink>
               </li>
             </ul>
           </div>
@@ -127,18 +127,18 @@ export default async function Footer() {
               © {new Date().getFullYear()} ZAHAN Fashion and Lifestyle. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <a
-                href="#"
+              <LocalizedClientLink
+                href="/privacy-policy"
                 className="text-grey-50 hover:text-grey-0 transition-colors text-sm"
               >
                 Privacy Policy
-              </a>
-              <a
-                href="#"
+              </LocalizedClientLink>
+              <LocalizedClientLink
+                href="/terms-of-service"
                 className="text-grey-50 hover:text-grey-0 transition-colors text-sm"
               >
                 Terms of Service
-              </a>
+              </LocalizedClientLink>
             </div>
           </div>
         </div>

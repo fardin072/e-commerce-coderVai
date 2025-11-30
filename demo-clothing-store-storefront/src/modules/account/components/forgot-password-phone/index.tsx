@@ -21,12 +21,15 @@ const ForgotPasswordPhone = ({ requestPasswordReset, onSuccess, onCancel }: Prop
 
         const result = await requestPasswordReset(email)
 
-        if (result.error) {
+        if (!result) {
+            setError("Failed to connect to server")
+            setLoading(false)
+        } else if (result.error) {
             setError(result.error)
             setLoading(false)
         } else if (result.phone) {
             setLoading(false)
-            onSuccess(result.phone) // Pass the phone number from server, not the email!
+            onSuccess(result.phone)
         } else {
             setError("Failed to get phone number from server")
             setLoading(false)

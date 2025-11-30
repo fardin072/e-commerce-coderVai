@@ -32,9 +32,12 @@ function ProductCardWithPrice({
   return (
     <LocalizedClientLink
       href={`/products/${product.handle}`}
-      className="group relative flex flex-col w-full h-full  border border-black-20 rounded-lg overflow-visible shadow-md hover:shadow-lg transition-all duration-300"
-      // className=" col-span-1 group relative border border-red-950"
+      className="group relative flex flex-col w-48 h-48 max-w-xs max-h-xs rounded-lg overflow-visible shadow-sm hover:shadow-lg transition-all duration-300"
       style={{
+        width: "192px",
+        height: "192px",
+        maxWidth: "192px",
+        maxHeight: "192px",
         aspectRatio: "1 / 1",
       }}
     >
@@ -53,12 +56,12 @@ function ProductCardWithPrice({
           </div>
         )}
 
-        {/* Discount Circle Badge - Top Right with overflow visible */}
+        {/* Discount Circle Badge - Top Right, only when there is a real discount */}
         {discountPercent > 0 && (
-          <div className="absolute top-[4px] right-[4px] transform translate-x-1/4 -translate-y-1/4 w-12 h-12 small:w-16 small:h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg z-20 border small:border-2 border-white">
-            <span className="text-white font-bold text-xs small:text-base text-center leading-tight">
-              {discountPercent}%<br />
-              <span className="text-xs small:text-sm">off</span>
+          <div className="absolute top-1 right-1 px-1 rounded-sm py-[1px] bg-red-500 flex items-center justify-center shadow-lg z-20">
+            <span className="text-white font-bold text-sm text-center">
+              {discountPercent}%
+              <span className="text-xs"> off</span>
             </span>
           </div>
         )}

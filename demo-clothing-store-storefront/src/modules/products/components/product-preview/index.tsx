@@ -35,10 +35,10 @@ export default function ProductPreview({
   const { cheapestPrice } = getProductPrice({
     product,
   })
-  
+
   const countryCode = useParams().countryCode as string
   const router = useRouter()
-  
+
   const [imageLoaded, setImageLoaded] = useState(false)
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
@@ -56,8 +56,8 @@ export default function ProductPreview({
   const basePrice = cheapestPrice?.original_price_number || cheapestPrice?.calculated_price_number || 0
   const discountedPrice = cheapestPrice?.calculated_price_number || 0
   const hasDiscount = basePrice > discountedPrice && discountedPrice > 0
-  const discountPercentage = hasDiscount 
-    ? Math.round(((basePrice - discountedPrice) / basePrice) * 100) 
+  const discountPercentage = hasDiscount
+    ? Math.round(((basePrice - discountedPrice) / basePrice) * 100)
     : 0
 
   // Use formatted prices directly
@@ -87,7 +87,7 @@ export default function ProductPreview({
   // Check if variant is in stock
   const isSelectedVariantInStock = useMemo(() => {
     if (!selectedVariant) return false
-    
+
     if (!selectedVariant.manage_inventory) {
       return true
     }
@@ -106,7 +106,7 @@ export default function ProductPreview({
   // Determine if Add to Cart button should be enabled
   const canAddToCart = useMemo(() => {
     if (!inStock) return false
-    
+
     // If single variant or no variants, button is enabled by default
     if ((product.variants?.length ?? 0) <= 1) {
       return true
@@ -129,24 +129,24 @@ export default function ProductPreview({
   )
   const colorValues = colorOption
     ? product.variants
-        ?.flatMap((v) =>
-          v.options
-            ?.filter((opt) => opt.option_id === colorOption.id)
-            .map((opt) => ({ id: opt.option_id, value: opt.value }))
-        )
-        .filter(Boolean)
-        .reduce((acc: any[], curr: any) => {
-          if (!acc.find((c) => c.value === curr?.value)) {
-            acc.push(curr)
-          }
-          return acc
-        }, [])
+      ?.flatMap((v) =>
+        v.options
+          ?.filter((opt) => opt.option_id === colorOption.id)
+          .map((opt) => ({ id: opt.option_id, value: opt.value }))
+      )
+      .filter(Boolean)
+      .reduce((acc: any[], curr: any) => {
+        if (!acc.find((c) => c.value === curr?.value)) {
+          acc.push(curr)
+        }
+        return acc
+      }, [])
     : []
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     const variantToAdd = selectedVariant || product.variants?.[0]
     if (!variantToAdd?.id) return
 
@@ -194,14 +194,13 @@ export default function ProductPreview({
   return (
     <div
       ref={cardRef}
-      className={`group relative flex flex-col h-full w-full bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer border border-grey-20 ${
-        isNavigating ? 'opacity-75' : ''
-      }`}
+      className={`group relative flex flex-col h-fit w-full bg-white shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer ${isNavigating ? 'opacity-75' : ''
+        }`}
       onClick={handleCardClick}
       data-clickable="true"
     >
       {/* Image Container - 1:1 Ratio, Max 300px */}
-      <div className="relative mx-auto w-full max-w-[300px] aspect-square bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg overflow-hidden">
+      <div className="relative mx-auto w-full max-w-[300px] aspect-square bg-gradient-to-br from-slate-50 to-slate-100 overflow-hidden">
         {/* Skeleton Loading */}
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 animate-pulse z-0" />
@@ -217,20 +216,6 @@ export default function ProductPreview({
           />
         </div>
 
-        {/* Badges - Top Left */}
-        <div className="absolute top-2 left-2 flex flex-col gap-2 z-10">
-          {isNew && (
-            <span className="inline-flex items-center px-2 py-1 bg-white/90 backdrop-blur-md text-orange-600 text-xs font-bold rounded-md shadow-md">
-              ✨ New
-            </span>
-          )}
-          {isFeatured && (
-            <span className="inline-flex items-center px-2 py-1 bg-white/90 backdrop-blur-md text-pink-600 text-xs font-bold rounded-md shadow-md">
-              ⭐ Featured
-            </span>
-          )}
-        </div>
-
         {/* Stock Status Indicator */}
         {!inStock && (
           <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-20">
@@ -240,7 +225,7 @@ export default function ProductPreview({
 
         {/* Loading Overlay */}
         {isNavigating && (
-          <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg shadow-2xl">
+          <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50 shadow-2xl">
             <div className="flex flex-col items-center gap-3">
               <DotSpinner size="lg" color="#262626" />
               <p className="text-sm font-semibold text-slate-700">Opening...</p>
@@ -251,21 +236,11 @@ export default function ProductPreview({
 
       {/* Discount Badge - show only when there is a real discount */}
       {hasDiscount && (
-        <div className="absolute top-2 right-2 small:top-3 small:right-3 z-30">
-          <div className="relative">
-            <div className="w-12 h-12 small:w-16 small:h-16 rounded-full flex items-center justify-center shadow-xl border-2 border-white transform hover:scale-110 transition-transform bg-gradient-to-br from-red-500 via-red-600 to-red-700">
-              <div className="text-center">
-                <div className="text-white font-black leading-tight drop-shadow-lg text-sm small:text-base">
-                  {discountPercentage}%
-                </div>
-                <div className="text-white text-xs font-bold tracking-widest">
-                  OFF
-                </div>
-              </div>
-            </div>
-            {/* Shine Effect */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent pointer-events-none"></div>
-          </div>
+        <div className="absolute top-1 right-1 px-3 py-[1px] bg-red-500 flex items-center justify-center shadow-2xl  z-20">
+          <span className="text-white font-bold text-md text-center">
+            {discountPercentage}%
+            <span className="text-xs"> off</span>
+          </span>
         </div>
       )}
 
@@ -315,10 +290,31 @@ export default function ProductPreview({
           )}
         </div>
 
+        {/* Add to Cart Button - Always at bottom */}
+        <div className="">
+          <button
+            onClick={handleAddToCart}
+            disabled={!canAddToCart || isAdding}
+            className={`w-full py-2 px-3 font-semibold text-sm transition-all flex items-center justify-center gap-2 ${canAddToCart && !isAdding
+              ? "bg-slate-900 text-white hover:bg-slate-800"
+              : "bg-slate-200 text-slate-500 cursor-not-allowed"
+              }`}
+          >
+            {isAdding ? (
+              <>
+                <DotSpinner size="sm" color="#ffffff" />
+                <span>Adding</span>
+              </>
+            ) : (
+              "Add to Cart"
+            )}
+          </button>
+        </div>
+
         {/* Variant Options - Only show if product has multiple variants */}
         {hasVariants && (
-          <div 
-            className="space-y-3 mb-4 pb-3 border-b border-slate-200"
+          <div
+            className="pt-1 space-y-1 border-slate-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Color Swatches */}
@@ -352,27 +348,7 @@ export default function ProductPreview({
           </div>
         )}
 
-        {/* Add to Cart Button - Always at bottom */}
-        <div className="mt-auto pt-3">
-          <button
-            onClick={handleAddToCart}
-            disabled={!canAddToCart || isAdding}
-            className={`w-full py-2 px-3 rounded-md font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
-              canAddToCart && !isAdding
-                ? "bg-slate-900 text-white hover:bg-slate-800"
-                : "bg-slate-200 text-slate-500 cursor-not-allowed"
-            }`}
-          >
-            {isAdding ? (
-              <>
-                <DotSpinner size="sm" color="#ffffff" />
-                <span>Adding</span>
-              </>
-            ) : (
-              "Add to Cart"
-            )}
-          </button>
-        </div>
+
       </div>
     </div>
   )

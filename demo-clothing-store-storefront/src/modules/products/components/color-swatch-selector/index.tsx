@@ -46,10 +46,7 @@ const ColorSwatchSelector: React.FC<ColorSwatchSelectorProps> = ({
   }
 
   return (
-    <div className="space-y-3">
-      <label className="block text-sm font-semibold text-slate-900">
-        Color
-      </label>
+    <div className="pt-1">
       <div className="flex flex-wrap gap-3">
         {colorOptions.map((option) => {
           const hexColor = getColorHex(option.value)

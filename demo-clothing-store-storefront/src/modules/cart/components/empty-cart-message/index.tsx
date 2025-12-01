@@ -51,22 +51,6 @@ const EmptyCartMessage = () => {
             Continue Shopping
           </a>
         </div>
-
-        {/* Featured Categories Hint */}
-        <div className="mt-12 pt-8 border-t border-slate-200">
-          <p className="text-xs small:text-sm text-slate-500 mb-4">Popular Categories</p>
-          <div className="flex flex-wrap gap-2 justify-center">
-            <span className="px-3 py-1 bg-slate-50 text-slate-600 rounded-full text-xs border border-slate-200">
-              New Arrivals
-            </span>
-            <span className="px-3 py-1 bg-slate-50 text-slate-600 rounded-full text-xs border border-slate-200">
-              Best Sellers
-            </span>
-            <span className="px-3 py-1 bg-slate-50 text-slate-600 rounded-full text-xs border border-slate-200">
-              Sale
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   )

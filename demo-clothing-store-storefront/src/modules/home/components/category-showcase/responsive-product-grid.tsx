@@ -30,7 +30,7 @@ export default function ResponsiveProductGrid({
 
   if (!isMounted) {
     return (
-      <div className="grid gap-3 small:gap-4 grid-cols-2 xsmall:grid-cols-2 small:grid-cols-4">
+      <div className="grid gap-2 small:gap-4 grid-cols-2 xsmall:grid-cols-2 small:grid-cols-4">
         {products.slice(0, 7).map((product) => (
           <ProductCardWithPrice key={product.id} product={product} />
         ))}
@@ -44,7 +44,7 @@ export default function ResponsiveProductGrid({
   const displayProducts = products.slice(0, 7)
 
   return (
-    <div className="grid gap-3 small:gap-4 grid-cols-2 xsmall:grid-cols-2 small:grid-cols-4">
+    <div className="grid gap-2 small:gap-4 grid-cols-2 xsmall:grid-cols-2 small:grid-cols-4">
       {displayProducts.map((product) => (
         <ProductCardWithPrice key={product.id} product={product} />
       ))}

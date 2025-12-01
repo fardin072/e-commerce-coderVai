@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 interface Slide {
@@ -74,12 +75,16 @@ export default function HomeHero() {
           >
             <LocalizedClientLink
               href={slide.link}
-              className="block w-full h-full"
+              className="block w-full h-full relative"
             >
-              <img
+              <Image
                 src={slide.image}
                 alt={slide.alt}
-                className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform duration-700"
+                fill
+                className="object-cover cursor-pointer hover:scale-105 transition-transform duration-700"
+                quality={85}
+                priority={index === 0}
+                sizes="100vw"
               />
             </LocalizedClientLink>
           </div>
@@ -138,8 +143,8 @@ export default function HomeHero() {
               key={index}
               onClick={() => goToSlide(index)}
               className={`transition-all duration-300 rounded-full ${index === currentSlide
-                ? "bg-grey-0 w-6 h-1.5 xsmall:w-8 xsmall:h-2 small:w-10 small:h-2.5"
-                : "bg-grey-0/50 hover:bg-grey-0/70 w-1.5 h-1.5 xsmall:w-2 xsmall:h-2 small:w-2.5 small:h-2.5"
+                  ? "bg-grey-0 w-6 h-1.5 xsmall:w-8 xsmall:h-2 small:w-10 small:h-2.5"
+                  : "bg-grey-0/50 hover:bg-grey-0/70 w-1.5 h-1.5 xsmall:w-2 xsmall:h-2 small:w-2.5 small:h-2.5"
                 }`}
               aria-label={`Go to slide ${index + 1}`}
               aria-current={index === currentSlide}

@@ -110,7 +110,7 @@ const Item = ({ item, type = "full", currencyCode, renderMode = "desktop" }: Ite
     <>
       {/* Desktop/Table View */}
       <Table.Row className="w-full" data-testid="product-row">
-        <Table.Cell className="!pl-0 p-4 w-24">
+        <Table.Cell className="!pl-2 p-4 w-24">
           <LocalizedClientLink
             href={`/products/${item.product_handle}`}
             className={clx("flex", {
@@ -163,9 +163,9 @@ const Item = ({ item, type = "full", currencyCode, renderMode = "desktop" }: Ite
           </Table.Cell>
         )}
 
-        <Table.Cell className="!pr-0">
+        <Table.Cell className="!pr-2">
           <span
-            className={clx("!pr-0", {
+            className={clx("!pr-2", {
               "flex flex-col items-end h-full justify-center": type === "preview",
             })}
           >

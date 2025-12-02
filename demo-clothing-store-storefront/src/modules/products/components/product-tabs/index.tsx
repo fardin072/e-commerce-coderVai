@@ -6,6 +6,7 @@ import Refresh from "@modules/common/icons/refresh"
 import ReviewsSection from "@modules/products/components/reviews-section"
 import Accordion from "./accordion"
 import { HttpTypes } from "@medusajs/types"
+import ProductDescriptionSection from "../product-description-section"
 
 type ProductTabsProps = {
   product: HttpTypes.StoreProduct
@@ -52,15 +53,11 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
 const ProductDescriptionTab = ({ product }: ProductTabsProps) => {
   return (
     <div className="text-sm-regular py-8 space-y-4">
-      {product.description ? (
-        <div className="prose prose-sm max-w-none">
-          <p className="text-slate-700 leading-relaxed whitespace-pre-line">
-            {product.description}
-          </p>
-        </div>
-      ) : (
-        <p className="text-slate-500">No description available.</p>
-      )}
+      {product.description ?
+        <ProductDescriptionSection product={product} />
+        : (
+          <p className="text-slate-500">No description available.</p>
+        )}
 
       {product.tags && product.tags.length > 0 && (
         <div className="mt-6 pt-6 border-t border-slate-200">
@@ -131,11 +128,10 @@ const SpecificationsTab = ({ product }: ProductTabsProps) => {
                   )}
                 </div>
                 <span
-                  className={`text-sm font-medium ${
-                    variant.manage_inventory && (variant.inventory_quantity || 0) > 0
+                  className={`text-sm font-medium ${variant.manage_inventory && (variant.inventory_quantity || 0) > 0
                       ? "text-green-600"
                       : "text-slate-500"
-                  }`}
+                    }`}
                 >
                   {variant.manage_inventory
                     ? `${variant.inventory_quantity || 0} in stock`

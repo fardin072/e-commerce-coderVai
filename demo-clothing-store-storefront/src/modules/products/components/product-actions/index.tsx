@@ -237,7 +237,7 @@ export default function ProductActions({
           </div>
           <div className="w-full h-full">
             {/* Action Buttons */}
-            <div className="flex flex-col  xsmall:flex-row gap-2 h-full">
+            <div className="flex gap-1 xsmall:gap-2 h-full">
               {/* Add to Cart Button */}
               <Button
                 onClick={handleAddToCart}
@@ -249,7 +249,7 @@ export default function ProductActions({
                   !isValidVariant
                 }
                 variant="primary"
-                className="w-full rounded-none text-base font-semibold"
+                className="w-full rounded-none text-sm xsmall:text-base font-semibold"
                 isLoading={isAdding}
                 data-testid="add-product-button"
               >

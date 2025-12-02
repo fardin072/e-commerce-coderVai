@@ -125,7 +125,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
 
       {/* Dimensions and Details - Compact */}
       {(product.weight || product.length || product.width || product.height || product.material) && (
-        <div className="border-t border-slate-200 pt-3 space-y-1 text-xs">
+        <div className="border-t border-slate-100 pt-3 space-y-1 text-xs">
           <div className="grid grid-cols-2 gap-2 text-slate-600">
             {product.weight && (
               <div>

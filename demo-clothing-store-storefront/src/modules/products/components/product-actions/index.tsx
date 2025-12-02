@@ -1,6 +1,6 @@
 "use client"
 
-import { addToCart } from "@lib/data/cart"
+import { addToCart, clearCart } from "@lib/data/cart"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -139,6 +139,27 @@ export default function ProductActions({
     setIsAdding(false)
   }
 
+  // Buy now: clear cart, add this product only, and navigate to checkout
+  const handleBuyNow = async () => {
+    if (!selectedVariant?.id) return null
+
+    setIsAdding(true)
+
+    // Clear existing cart items first (Buy Now is for this item only)
+    await clearCart()
+
+    await addToCart({
+      variantId: selectedVariant.id,
+      quantity: quantity,
+      countryCode,
+    })
+
+    setIsAdding(false)
+
+    // Navigate to checkout page with address step open
+    router.push(`/${countryCode}/checkout?step=address`)
+  }
+
   // Extract color options if available
   const colorOption = product.options?.find(
     (opt) => opt.title?.toLowerCase() === "color"
@@ -262,7 +283,7 @@ export default function ProductActions({
 
               {/* Buy Now Button */}
               <Button
-                onClick={handleAddToCart}
+                onClick={handleBuyNow}
                 disabled={
                   !inStock ||
                   !selectedVariant ||

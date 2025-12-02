@@ -203,7 +203,7 @@ export async function deleteLineItem(lineId: string) {
   }
 
   await sdk.store.cart
-    .deleteLineItem(cartId, lineId, headers)
+    .deleteLineItem(cartId, lineId, {}, headers)
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")
       revalidateTag(cartCacheTag)
@@ -212,6 +212,37 @@ export async function deleteLineItem(lineId: string) {
       revalidateTag(fulfillmentCacheTag)
     })
     .catch(medusaError)
+}
+
+export async function clearCart() {
+  const cartId = await getCartId()
+
+  if (!cartId) {
+    return
+  }
+
+  const cart = await retrieveCart(cartId)
+
+  if (!cart || !cart.items || cart.items.length === 0) {
+    return
+  }
+
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  // Delete all line items
+  await Promise.all(
+    cart.items.map((item) =>
+      sdk.store.cart.deleteLineItem(cartId, item.id, {}, headers)
+    )
+  ).then(async () => {
+    const cartCacheTag = await getCacheTag("carts")
+    revalidateTag(cartCacheTag)
+
+    const fulfillmentCacheTag = await getCacheTag("fulfillment")
+    revalidateTag(fulfillmentCacheTag)
+  })
 }
 
 export async function setShippingMethod({

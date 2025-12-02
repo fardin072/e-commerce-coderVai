@@ -7,6 +7,7 @@ import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
+import ProductDescriptionSection from "@modules/products/components/product-description-section"
 import { notFound } from "next/navigation"
 import { HttpTypes } from "@medusajs/types"
 
@@ -144,6 +145,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
                 >
                   <ProductActionsWrapper id={product.id} region={region} />
                 </Suspense>
+
+                {/* Product Description Section - Under Action Buttons */}
+                <ProductDescriptionSection product={product} />
               </div>
             </div>
           </div>

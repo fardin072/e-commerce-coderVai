@@ -1,6 +1,7 @@
 "use client"
 
 import { HttpTypes } from "@medusajs/types"
+import { usePathname } from "next/navigation"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { getCategoryIcon } from "../category-icons"
 
@@ -9,32 +10,50 @@ interface CategoriesMenuProps {
 }
 
 export default function CategoriesMenu({ categories }: CategoriesMenuProps) {
+  const pathname = usePathname()
+
   // Filter top-level categories only
   const topLevelCategories = categories.filter((cat) => !cat.parent_category)
 
+  // Check if a category is active based on current path
+  const isCategoryActive = (categoryHandle: string): boolean => {
+    return pathname.includes(`/categories/${categoryHandle}`)
+  }
+
   return (
-    <div className="w-full flex justify-center">
+    <div className="w-full flex justify-center bg-slate-900">
       <div className="flex items-center gap-3 small:gap-6 overflow-x-auto scrollbar-hide px-4">
         {topLevelCategories.length > 0 ? (
           topLevelCategories.map((category) => {
             const IconComponent = getCategoryIcon(category.name)
+            const isActive = isCategoryActive(category.handle)
 
             return (
               <LocalizedClientLink
                 key={category.id}
                 href={`/categories/${category.handle}`}
-                className="flex items-center gap-2 small:gap-2.5 px-1 py-2 text-grey-70 hover:text-grey-90 transition-colors group whitespace-nowrap flex-shrink-0 text-xs small:text-sm"
+                className={`flex items-center gap-2 small:gap-2.5 px-3 py-2 transition-all group whitespace-nowrap flex-shrink-0 text-xs small:text-sm font-medium ${
+                  isActive
+                    ? "bg-slate-100 text-slate-900"
+                    : "text-white hover:bg-slate-700"
+                }`}
                 title={category.name}
               >
-                <div className="w-5 h-5 small:w-6 small:h-6 flex-shrink-0 group-hover:scale-110 transition-transform">
+                <div className={`w-5 h-5 small:w-6 small:h-6 flex-shrink-0 transition-all ${
+                  isActive
+                    ? "text-slate-900"
+                    : "text-white group-hover:scale-110"
+                }`}>
                   <IconComponent size={24} />
                 </div>
-                <span className="hidden small:inline text-xs small:text-sm font-medium">{category.name}</span>
+                <span className="hidden small:inline text-xs small:text-sm font-medium">
+                  {category.name}
+                </span>
               </LocalizedClientLink>
             )
           })
         ) : (
-          <div className="px-4 py-3 text-grey-60 text-sm">
+          <div className="px-4 py-3 text-grey-40 text-sm">
             No categories available
           </div>
         )}

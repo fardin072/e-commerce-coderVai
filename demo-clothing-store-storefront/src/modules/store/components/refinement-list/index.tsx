@@ -1,9 +1,6 @@
-"use client"
-
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useCallback } from "react"
-
-import SortProducts, { SortOptions } from "./sort-products"
+import { listCategories } from "@lib/data/categories"
+import RefinementListClient from "./refinement-list-client"
+import { SortOptions } from "./sort-products"
 
 type RefinementListProps = {
   sortBy: SortOptions
@@ -11,31 +8,35 @@ type RefinementListProps = {
   'data-testid'?: string
 }
 
-const RefinementList = ({ sortBy, 'data-testid': dataTestId }: RefinementListProps) => {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+const RefinementList = async ({
+  sortBy,
+  'data-testid': dataTestId,
+}: RefinementListProps) => {
+  try {
+    const allCategories = await listCategories({ limit: 100 })
 
-  const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams)
-      params.set(name, value)
+    // Filter out categories with no products and sort by name
+    const categories = allCategories
+      .filter((cat) => cat.products && cat.products.length > 0)
+      .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
 
-      return params.toString()
-    },
-    [searchParams]
-  )
-
-  const setQueryParams = (name: string, value: string) => {
-    const query = createQueryString(name, value)
-    router.push(`${pathname}?${query}`)
+    return (
+      <RefinementListClient
+        sortBy={sortBy}
+        categories={categories}
+        data-testid={dataTestId}
+      />
+    )
+  } catch (error) {
+    // If categories fail to load, render with empty categories
+    return (
+      <RefinementListClient
+        sortBy={sortBy}
+        categories={[]}
+        data-testid={dataTestId}
+      />
+    )
   }
-
-  return (
-    <div className="flex small:flex-col gap-12 py-4 mb-8 small:px-0 pl-6 small:min-w-[250px] small:ml-[1.675rem]">
-      <SortProducts sortBy={sortBy} setQueryParams={setQueryParams} data-testid={dataTestId} />
-    </div>
-  )
 }
 
 export default RefinementList

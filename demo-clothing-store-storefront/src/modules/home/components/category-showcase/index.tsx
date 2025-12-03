@@ -6,6 +6,7 @@ import Image from "next/image"
 import { listProducts } from "@lib/data/products"
 import ProductCardWithPrice from "./product-card"
 import ResponsiveProductGrid from "./responsive-product-grid"
+import { Ratio } from "lucide-react"
 
 interface CategoryShowcaseProps {
   categories: HttpTypes.StoreProductCategory[]
@@ -14,12 +15,12 @@ interface CategoryShowcaseProps {
 
 const getRandomImage = (index: number) => {
   const images = [
-    "https://i.ibb.co/HfD36V9w/Screenshot-2025-11-27-at-2-36-01-AM.png",
-    "https://i.ibb.co.com/cXw2rrD7/hp.jpg",
-    "https://i.ibb.co/HfD36V9w/Screenshot-2025-11-27-at-2-36-01-AM.png",
-    "https://i.ibb.co.com/cXw2rrD7/hp.jpg",
-    "https://i.ibb.co/HfD36V9w/Screenshot-2025-11-27-at-2-36-01-AM.png",
-    "https://i.ibb.co.com/cXw2rrD7/hp.jpg",
+    "https://i.ibb.co.com/6SypGNs/1.jpg",
+    "https://i.ibb.co.com/qYb0q9Rn/Black-Premium-Leather-Square-Backpack-SB-BP129-3.jpg",
+    "https://i.ibb.co.com/B5LMxDy2/3.jpg",
+    "https://i.ibb.co.com/G4Mh2PYJ/4.jpg",
+    "https://i.ibb.co.com/gFrZVRn6/5.webp",
+    "https://i.ibb.co.com/PZTBMyBG/6.webp",
     "https://i.ibb.co.com/B5t4yDsR/Screenshot-2025-11-27-at-2-41-10-AM.png",
     "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&h=400&fit=crop",
     "https://images.unsplash.com/photo-1595707707802-51b39fd9b371?w=600&h=400&fit=crop",
@@ -45,30 +46,32 @@ export default async function CategoryShowcase({
   let imageIndex = 0
 
   return (
-    <div className="w-full py-12 xsmall:py-16 small:py-24">
+    <div className="w-full py-2 xsmall:py-10 small:py-16">
       <div className="content-container">
-        <div className="flex flex-col gap-12 xsmall:gap-16">
+        <div className="flex flex-col">
 
           {/* Category Grid - Responsive */}
           <div className="w-full">
-            <div className="grid grid-cols-1 xsmall:grid-cols-2 small:grid-cols-3 gap-4 xsmall:gap-6 small:gap-8">
+            <div className="grid grid-cols-3 gap-1">
               {topLevelCategories.map((category) => {
                 const currentImage = getRandomImage(imageIndex++)
                 return (
                   <LocalizedClientLink
                     key={category.id}
                     href={`/categories/${category.handle}`}
-                    className="relative group cursor-pointer overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 aspect-square xsmall:aspect-auto xsmall:h-56 small:h-64"
+                    className="relative group cursor-pointer overflow-hidden shadow-sm rounded-sm hover:shadow-md transition-all duration-300"
+                    style={{ aspectRatio: "1 / 1" }}
                   >
                     <Image
                       src={currentImage}
                       alt={category.name}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      style={{ aspectRatio: "1 / 1" }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center px-3 xsmall:px-4 py-3 xsmall:py-4">
-                      <h3 className="text-center font-semibold text-white text-lg xsmall:text-xl small:text-2xl line-clamp-2">
+                    <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center px-2 xsmall:px-4 py-1 xsmall:py-4">
+                      <h3 className="text-center font-semibold text-white text-xs xsmall:text-xl small:text-2xl line-clamp-2">
                         {category.name}
                       </h3>
                     </div>
@@ -78,10 +81,10 @@ export default async function CategoryShowcase({
             </div>
           </div>
 
-          {/* Featured ZAHAN Section - Big Card visible only on small screens and above */}
-          <div className="w-full pt-12 xsmall:pt-16 small:pt-24">
-            {/* Big Card - Hidden on tablet and smaller */}
-            <div className="hidden small:flex flex-col xsmall:flex-row bg-white overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 rounded-lg">
+          {/* Featured ZAHAN Section */}
+          <div className="w-full mt-2 xsmall:mt-5">
+            {/* Big Card */}
+            <div className=" flex flex-col xsmall:flex-row bg-white overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300 rounded-lg">
               {/* Left Section - Full width on mobile, 3/4 on larger screens */}
               <div className="w-full xsmall:w-3/4 p-6 xsmall:p-8 small:p-12 flex flex-col justify-between bg-gradient-to-br from-gray-50 to-white">
                 <div>
@@ -104,7 +107,7 @@ export default async function CategoryShowcase({
               </div>
 
               {/* Right Section - Hidden on mobile, 1/4 width on larger screens */}
-              <div className="hidden xsmall:block xsmall:w-1/4 relative overflow-hidden min-h-48 xsmall:min-h-64">
+              <div className=" xsmall:block xsmall:w-1/4 relative overflow-hidden min-h-28 xsmall:min-h-64">
                 <Image
                   src={getRandomImage(6)}
                   alt="ZAHAN"
@@ -112,16 +115,6 @@ export default async function CategoryShowcase({
                   className="object-cover"
                 />
               </div>
-            </div>
-
-            {/* Title Only - Visible on tablet and smaller */}
-            <div className="small:hidden py-6">
-              <h2 className="text-2xl xsmall:text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent">
-                ZAHAN
-              </h2>
-              <p className="text-gray-600 text-sm xsmall:text-base mt-2">
-                Premium Collection
-              </p>
             </div>
           </div>
 
@@ -253,7 +246,7 @@ async function AllProductsRow({
       {/* 6th Card - See All Button with Hover Overlay */}
       <div
         className="relative group overflow-hidden shadow-sm bg-gradient-to-br from-gray-100 to-gray-200"
-        
+
       >
         <div className="w-full h-full flex items-center justify-center group-hover:opacity-30 transition-opacity duration-300">
           <div className="text-center">

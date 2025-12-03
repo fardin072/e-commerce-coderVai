@@ -22,7 +22,7 @@ export default function CategoriesMenu({ categories }: CategoriesMenuProps) {
 
   return (
     <div className="w-full flex justify-center" style={{ backgroundColor: '#F1F5F9' }}>
-      <div className="flex items-center gap-3 small:gap-6 overflow-x-auto scrollbar-hide px-4">
+      <div className="flex items-center w-full border justify-between overflow-x-auto scrollbar-hide">
         {topLevelCategories.length > 0 ? (
           topLevelCategories.map((category) => {
             const IconComponent = getCategoryIcon(category.name)
@@ -32,21 +32,21 @@ export default function CategoriesMenu({ categories }: CategoriesMenuProps) {
               <LocalizedClientLink
                 key={category.id}
                 href={`/categories/${category.handle}`}
-                className={`flex items-center gap-2 small:gap-2.5 px-3 py-2 transition-all group whitespace-nowrap flex-shrink-0 text-xs small:text-sm font-medium ${isActive
+                className={`flex items-center gap-1 small:gap-2 px-5 py-2 transition-all group whitespace-nowrap flex-shrink-0 text-xs small:text-sm font-medium ${isActive
                   ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-900 hover:bg-white hover:shadow-sm"
                   }`}
                 title={category.name}
               >
-                <div className={`w-5 h-5 small:w-6 small:h-6 flex-shrink-0 transition-all ${isActive
+                <div className={`flex-shrink-0 transition-all ${isActive
                   ? "text-slate-900"
                   : "text-slate-900 group-hover:scale-110"
                   }`}>
-                  <IconComponent size={24} />
+                  <IconComponent className="" size={16} />
                 </div>
-                <span className="hidden small:inline text-xs small:text-sm font-medium">
+                <div className="hidden small:inline text-xs small:text-sm font-medium">
                   {category.name}
-                </span>
+                </div>
               </LocalizedClientLink>
             )
           })

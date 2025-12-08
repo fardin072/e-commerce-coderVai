@@ -46,11 +46,6 @@ export default function CentralSearch({
     }
   }
 
-  const handleCategorySelect = (categoryId: string) => {
-    setSelectedCategory(selectedCategory === categoryId ? null : categoryId)
-    setShowCategoryDropdown(false)
-  }
-
   const selectedCategoryName = categories.find(
     (c) => c.id === selectedCategory
   )?.name
@@ -59,63 +54,6 @@ export default function CentralSearch({
     <div className="flex-1 flex gap-3 items-center justify-between">
       {/* Left Section: Category Dropdown + Search */}
       <div className="flex-1 flex gap-2 items-center">
-        {/* Category Filter Dropdown */}
-        <div className="relative" ref={categoryRef}>
-          <button
-            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            className="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 active:bg-slate-300 transition-colors text-xs small:text-sm font-medium border border-slate-200 flex items-center gap-1 whitespace-nowrap"
-            aria-label="Filter by category"
-          >
-            <svg
-              className="w-4 h-4 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-              />
-            </svg>
-            <span className="hidden small:inline truncate max-w-[150px]">
-              {selectedCategoryName || "Category"}
-            </span>
-          </button>
-
-          {/* Category Dropdown Menu */}
-          {showCategoryDropdown && (
-            <div className="absolute top-full left-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-xl z-40 w-56 max-h-80 overflow-y-auto">
-              <div className="p-2">
-                <button
-                  onClick={() => handleCategorySelect("")}
-                  className={`w-full text-left px-3 py-2 rounded-md transition-colors text-sm ${
-                    !selectedCategory
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "hover:bg-slate-50 text-slate-700"
-                  }`}
-                >
-                  All Categories
-                </button>
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => handleCategorySelect(category.id)}
-                    className={`w-full text-left px-3 py-2 rounded-md transition-colors text-sm truncate ${
-                      selectedCategory === category.id
-                        ? "bg-blue-50 text-blue-700 font-medium"
-                        : "hover:bg-slate-50 text-slate-700"
-                    }`}
-                    title={category.name}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* Search Input */}
         <form onSubmit={handleSearch} className="flex-1 relative">
@@ -155,20 +93,7 @@ export default function CentralSearch({
         className="px-3 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 active:bg-slate-300 transition-colors text-xs small:text-sm font-medium border border-slate-200 flex items-center gap-1 whitespace-nowrap flex-shrink-0"
         aria-label="View all products"
       >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
-        <span className="hidden small:inline">All Products</span>
+        <span className="hidden small:inline">Exclusive Collections</span>
       </LocalizedClientLink>
     </div>
   )

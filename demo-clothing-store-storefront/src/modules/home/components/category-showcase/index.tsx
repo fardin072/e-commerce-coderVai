@@ -60,7 +60,7 @@ export default async function CategoryShowcase({
 
           {/* Category Grid - Responsive */}
           <div className="w-full max-w-6xl mx-auto">
-            <div className="grid grid-cols-3 small:grid-cols-4 medium:grid-cols-6 gap-2 small:gap-3">
+            <div className="grid grid-cols-3 medium:grid-cols-6 gap-2 small:gap-3">
               {topLevelCategories.map((category) => {
                 const currentImage = getRandomImage(imageIndex++)
                 return (
@@ -80,7 +80,7 @@ export default async function CategoryShowcase({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center px-2 xsmall:px-4 py-1 xsmall:py-4">
-                      <h3 className="text-center font-semibold text-white text-xs xsmall:text-xl small:text-2xl line-clamp-2">
+                      <h3 className="text-center font-semibold text-white text-xs xsmall:text-xl line-clamp-2">
                         {category.name}
                       </h3>
                     </div>

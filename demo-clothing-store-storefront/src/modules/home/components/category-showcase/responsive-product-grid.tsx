@@ -59,7 +59,7 @@ function SeeAllCard({ categoryHandle }: { categoryHandle: string }) {
   return (
     <LocalizedClientLink
       href={`/categories/${categoryHandle}`}
-      className="group relative overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center min-h-full"
+      className="group rounded-sm relative overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center min-h-full"
       style={{
       }}
     >
@@ -72,7 +72,7 @@ function SeeAllCard({ categoryHandle }: { categoryHandle: string }) {
         </p>
       </div>
 
-      <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="text-center">
           <p className="text-white font-semibold text-sm small:text-base">
             See All Products

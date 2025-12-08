@@ -32,17 +32,17 @@ function ProductCardWithPrice({
   return (
     <LocalizedClientLink
       href={`/products/${product.handle}`}
-      className="group w-full relative overflow-visible shadow-sm hover:shadow-lg transition-all duration-300"
+      className="group w-full relative overflow-visible shadow-sm rounded-sm hover:shadow-2xl transition-all duration-300"
       
     >
       {/* Image Container - 1:1 ratio */}
-      <div className="relative bg-gray-100 overflow-hidden flex-grow" style={{ aspectRatio: "1 / 1" }}>
+      <div className="relative bg-gray-100 overflow-hidden rounded-t-sm flex-grow" style={{ aspectRatio: "1 / 1" }}>
         {product.images && product.images.length > 0 ? (
           <Image
             src={product.images[0].url}
             alt={product.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover group-hover:scale-110 transition-transform duration-300"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 16vw"
           />
         ) : (
@@ -64,11 +64,11 @@ function ProductCardWithPrice({
 
       {/* Bottom Box - White box with xs shadow, positioned -2px from bottom */}
       <div
-        className="relative w-full bg-white/80 shadow-xs flex flex-col items-center justify-center px-2 py-1"
+        className="relative w-full shadow-md px-2 bg-gray-100/80 hover:bg-gray-100 flex flex-col items-center rounded-b-sm justify-center py-1"
         
       >
         {/* Title */}
-        <h3 className="text-xs font-semibold text-gray-900 line-clamp-1 text-center w-full">
+        <h3 className="text-lg font-semibold shadow-2xl text-gray-900 line-clamp-1 text-center w-full">
           {product.title}
         </h3>
 
@@ -79,12 +79,12 @@ function ProductCardWithPrice({
               <span className="text-xs text-gray-500 line-through">
                 {formatPrice(basePrice)}
               </span>
-              <span className="text-xs font-bold text-red-600">
+              <span className="text-base font-bold text-red-600">
                 {formatPrice(salePrice)}
               </span>
             </>
           ) : (
-            <span className="text-xs font-bold text-gray-900">
+            <span className="text-base font-bold text-red-600">
               {formatPrice(salePrice)}
             </span>
           )}

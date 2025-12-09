@@ -39,17 +39,23 @@ const OrdersWithAddressPage = () => {
     fetchOrders()
   }, [limit, offset])
 
+  const formatName = (address: any) => {
+    if (!address) return "N/A"
+
+    const name = `${address.first_name || ""} ${address.last_name || ""}`.trim()
+    return name || "N/A"
+  }
+
+  const formatPhone = (address: any) => {
+    if (!address) return "N/A"
+    return address.phone || "N/A"
+  }
+
   const formatAddress = (address: any) => {
     if (!address) return "N/A"
 
-    // According to schema.sql: order_address has:
-    // first_name, last_name, company, address_1, address_2, city, province, postal_code, country_code, phone
+    // Only include address parts, NOT name or phone
     const parts: string[] = []
-
-    // Add name if available
-    if (address.first_name || address.last_name) {
-      parts.push(`${address.first_name || ""} ${address.last_name || ""}`.trim())
-    }
 
     // Add company if available
     if (address.company) {
@@ -76,21 +82,31 @@ const OrdersWithAddressPage = () => {
       parts.push(address.country_code.toUpperCase())
     }
 
-    // Add phone if present
-    if (address.phone) {
-      parts.push(`📞 ${address.phone}`)
-    }
-
     return parts.length > 0 ? parts.join(", ") : "N/A"
   }
 
-  const formatCustomer = (order: any) => {
-    const name =
-      order.customer?.first_name || order.customer?.last_name
-        ? `${order.customer?.first_name || ""} ${order.customer?.last_name || ""}`.trim()
-        : null
-    const email = order.email || order.customer?.email
-    return name || email || "N/A"
+  const formatPaymentMethod = (order: any) => {
+    if (!order.payment_provider) return "N/A"
+
+    const providerId = order.payment_provider.toLowerCase()
+
+    // Extract the actual provider name from the ID
+    // Provider IDs are like "pp_sslcommerz_01..." or "pp_manual_01..."
+    if (providerId.includes("sslcommerz")) {
+      return "SSLCommerz"
+    } else if (providerId.includes("manual")) {
+      return "Manual/COD"
+    } else if (providerId.includes("cod") || providerId.includes("system")) {
+      return "COD"
+    } else {
+      // Try to extract a readable name from the provider ID
+      const match = providerId.match(/pp_(\w+)_/)
+      if (match && match[1]) {
+        // Capitalize first letter
+        return match[1].charAt(0).toUpperCase() + match[1].slice(1)
+      }
+      return "Other"
+    }
   }
 
 
@@ -133,10 +149,12 @@ const OrdersWithAddressPage = () => {
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell>Order #</Table.HeaderCell>
-              <Table.HeaderCell>Customer</Table.HeaderCell>
+              <Table.HeaderCell>Name</Table.HeaderCell>
+              <Table.HeaderCell>Mobile Number</Table.HeaderCell>
               <Table.HeaderCell>Email</Table.HeaderCell>
               <Table.HeaderCell>Status</Table.HeaderCell>
-              <Table.HeaderCell>Customer Address</Table.HeaderCell>
+              <Table.HeaderCell>Address</Table.HeaderCell>
+              <Table.HeaderCell>Payment Method</Table.HeaderCell>
               <Table.HeaderCell>Total</Table.HeaderCell>
               <Table.HeaderCell>Date</Table.HeaderCell>
             </Table.Row>
@@ -144,16 +162,16 @@ const OrdersWithAddressPage = () => {
           <Table.Body>
             {orders.length === 0 ? (
               <Table.Row>
-                <Table.Cell colSpan={6} className="text-center py-8">
+                <td colSpan={9} className="text-center py-8">
                   <Text size="small" className="text-gray-500">
                     No orders found
                   </Text>
-                </Table.Cell>
+                </td>
               </Table.Row>
             ) : (
               orders.map((order: any) => {
                 const address = order.shipping_address || order.billing_address
-                
+
                 // Get total from summary - amounts are already in whole units (e.g., 1630 BDT)
                 // Use current_order_total (what customer owes) or accounting_total (order total)
                 let total = 0
@@ -164,11 +182,11 @@ const OrdersWithAddressPage = () => {
                 } else if (order.total !== undefined && order.total !== null) {
                   total = order.total
                 }
-                
+
                 const currency = order.currency_code || "BDT"
-                
+
                 return (
-                  <Table.Row 
+                  <Table.Row
                     key={order.id}
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => navigate(`/orders/${order.id}`)}
@@ -179,7 +197,10 @@ const OrdersWithAddressPage = () => {
                       </Text>
                     </Table.Cell>
                     <Table.Cell>
-                      <Text size="small">{formatCustomer(order)}</Text>
+                      <Text size="small">{formatName(address)}</Text>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Text size="small">{formatPhone(address)}</Text>
                     </Table.Cell>
                     <Table.Cell>
                       <Text size="small">{order.email || order.customer?.email || "N/A"}</Text>
@@ -187,21 +208,23 @@ const OrdersWithAddressPage = () => {
                     <Table.Cell>
                       <Text
                         size="small"
-                        className={`capitalize ${
-                          order.status === "completed"
-                            ? "text-green-600"
-                            : order.status === "canceled"
+                        className={`capitalize ${order.status === "completed"
+                          ? "text-green-600"
+                          : order.status === "canceled"
                             ? "text-red-600"
                             : "text-blue-600"
-                        }`}
+                          }`}
                       >
                         {order.status}
                       </Text>
                     </Table.Cell>
                     <Table.Cell>
-                      <Text size="small" className="max-w-xs truncate">
+                      <Text size="small" className="whitespace-normal">
                         {formatAddress(address)}
                       </Text>
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Text size="small">{formatPaymentMethod(order)}</Text>
                     </Table.Cell>
                     <Table.Cell>
                       <Text size="small" weight="plus">
@@ -223,13 +246,13 @@ const OrdersWithAddressPage = () => {
                       <Text size="small">
                         {order.created_at
                           ? new Date(order.created_at).toLocaleString("en-US", {
-                              year: "numeric",
-                              month: "2-digit",
-                              day: "2-digit",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: true,
-                            })
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
                           : "N/A"}
                       </Text>
                     </Table.Cell>
@@ -271,10 +294,6 @@ const OrdersWithAddressPage = () => {
 
 export const config = defineRouteConfig({
   label: "Orders with Address",
-  link: {
-    label: "Orders (Address)",
-    icon: "ShoppingBag",
-  },
 })
 
 export default OrdersWithAddressPage

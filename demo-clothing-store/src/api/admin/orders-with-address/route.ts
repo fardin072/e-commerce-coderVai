@@ -4,13 +4,14 @@ import { Modules } from "@medusajs/framework/utils"
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
   try {
     const orderModuleService = req.scope.resolve(Modules.ORDER)
-    
+    const remoteQuery = req.scope.resolve("remoteQuery")
+
     const { limit = 20, offset = 0 } = req.query
 
     // According to schema.sql:
     // - order table has shipping_address_id and billing_address_id (FKs to order_address)
     // - order_address table has: address_1, address_2, city, province, postal_code, country_code, phone, first_name, last_name, company
-    
+
     // List orders with address relations
     // Try with relations first
     let orders: any[]
@@ -41,7 +42,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       orders = await Promise.all(
         orders.map(async (order: any) => {
           const result: any = { ...order }
-          
+
           // Fetch full order with relations
           try {
             const fullOrder = await orderModuleService.retrieveOrder(order.id, {
@@ -78,6 +79,54 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
           return result
         })
       )
+    }
+
+    // Fetch payment information separately using remoteQuery
+    try {
+      const orderIds = orders.map(o => o.id)
+
+      const paymentData = await remoteQuery({
+        entryPoint: "order_payment_collection",
+        fields: ["order_id", "payment_collection_id"],
+        variables: {
+          filters: {
+            order_id: orderIds,
+          },
+        },
+      })
+
+      // Get payment collection IDs
+      const paymentCollectionIds = paymentData.map((p: any) => p.payment_collection_id).filter(Boolean)
+
+      if (paymentCollectionIds.length > 0) {
+        const payments = await remoteQuery({
+          entryPoint: "payment",
+          fields: ["id", "provider_id", "payment_collection_id"],
+          variables: {
+            filters: {
+              payment_collection_id: paymentCollectionIds,
+            },
+          },
+        })
+
+        // Create a map of order_id -> provider_id
+        const orderPaymentMap: Record<string, string> = {}
+        paymentData.forEach((link: any) => {
+          const payment = payments.find((p: any) => p.payment_collection_id === link.payment_collection_id)
+          if (payment && link.order_id) {
+            orderPaymentMap[link.order_id] = payment.provider_id
+          }
+        })
+
+        // Enrich orders with payment provider
+        orders = orders.map(order => ({
+          ...order,
+          payment_provider: orderPaymentMap[order.id] || null,
+        }))
+      }
+    } catch (paymentError) {
+      console.warn("Could not fetch payment data:", paymentError)
+      // Continue without payment data
     }
 
     return res.status(200).json({

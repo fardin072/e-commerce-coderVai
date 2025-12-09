@@ -6,7 +6,48 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     const orderModuleService = req.scope.resolve(Modules.ORDER)
     const remoteQuery = req.scope.resolve("remoteQuery")
 
-    const { limit = 20, offset = 0 } = req.query
+    const {
+      limit = 20,
+      offset = 0,
+      search,
+      date_range,
+      payment_method,
+      status,
+      payment_status
+    } = req.query
+
+    // Build filter object
+    const filters: any = {}
+
+    // Date range filter
+    if (date_range && date_range !== 'all') {
+      const now = new Date()
+      let startDate: Date
+
+      switch (date_range) {
+        case 'today':
+          startDate = new Date(now.setHours(0, 0, 0, 0))
+          break
+        case 'week':
+          startDate = new Date(now.setDate(now.getDate() - 7))
+          break
+        case 'month':
+          startDate = new Date(now.setDate(now.getDate() - 30))
+          break
+        default:
+          startDate = new Date(0) // All time
+      }
+
+      filters.created_at = { $gte: startDate }
+    }
+
+    // Order status filter (custom_status in metadata)
+    if (status && status !== 'all') {
+      // We'll filter this after fetching since it's in metadata
+    }
+
+    // Search filter (applied after fetch since we need to search in addresses)
+    // Will filter by: display_id, email, phone, name
 
     // According to schema.sql:
     // - order table has shipping_address_id and billing_address_id (FKs to order_address)
@@ -19,10 +60,10 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 
     try {
       [orders, count] = await orderModuleService.listAndCountOrders(
-        {},
+        filters,
         {
-          take: Number(limit),
-          skip: Number(offset),
+          take: 1000, // Fetch more orders to allow filtering
+          skip: 0,
           order: { created_at: "DESC" },
           relations: ["shipping_address", "billing_address", "summary"],
         }
@@ -30,10 +71,10 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     } catch (relationError) {
       // If relations don't work, fetch orders and then fetch addresses separately
       [orders, count] = await orderModuleService.listAndCountOrders(
-        {},
+        filters,
         {
-          take: Number(limit),
-          skip: Number(offset),
+          take: 1000,
+          skip: 0,
           order: { created_at: "DESC" },
         }
       )
@@ -148,9 +189,62 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
       // Continue without payment data
     }
 
+    // Apply post-fetch filters
+    let filteredOrders = [...orders]
+
+    // Search filter (order #, email, phone, name)
+    if (search) {
+      const searchLower = String(search).toLowerCase()
+      filteredOrders = filteredOrders.filter(order => {
+        const displayId = String(order.display_id || '').toLowerCase()
+        const email = String(order.email || '').toLowerCase()
+        const shippingPhone = String(order.shipping_address?.phone || '').toLowerCase()
+        const billingPhone = String(order.billing_address?.phone || '').toLowerCase()
+        const shippingName = `${order.shipping_address?.first_name || ''} ${order.shipping_address?.last_name || ''}`.toLowerCase()
+        const billingName = `${order.billing_address?.first_name || ''} ${order.billing_address?.last_name || ''}`.toLowerCase()
+
+        return displayId.includes(searchLower) ||
+          email.includes(searchLower) ||
+          shippingPhone.includes(searchLower) ||
+          billingPhone.includes(searchLower) ||
+          shippingName.includes(searchLower) ||
+          billingName.includes(searchLower)
+      })
+    }
+
+    // Order status filter
+    if (status && status !== 'all') {
+      filteredOrders = filteredOrders.filter(order => {
+        const customStatus = order.metadata?.custom_status || order.status
+        return customStatus === status
+      })
+    }
+
+    // Payment method filter
+    if (payment_method && payment_method !== 'all') {
+      filteredOrders = filteredOrders.filter(order => {
+        return order.payment_provider === payment_method
+      })
+    }
+
+    // Payment status filter
+    if (payment_status && payment_status !== 'all') {
+      filteredOrders = filteredOrders.filter(order => {
+        return order.payment_status === payment_status
+      })
+    }
+
+    // Update count for filtered results
+    const filteredCount = filteredOrders.length
+
+    // Apply pagination after filtering
+    const startIndex = Number(offset)
+    const endIndex = startIndex + Number(limit)
+    const paginatedOrders = filteredOrders.slice(startIndex, endIndex)
+
     return res.status(200).json({
-      orders,
-      count,
+      orders: paginatedOrders,
+      count: filteredCount,
       limit: Number(limit),
       offset: Number(offset),
     })

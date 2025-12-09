@@ -1,5 +1,5 @@
 import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { Modules } from "@medusajs/framework/utils"
+import { Modules, ContainerRegistrationKeys } from "@medusajs/framework/utils"
 
 const VALID_CUSTOM_STATUSES = [
     'pending',
@@ -21,16 +21,12 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     }
 
     const orderModuleService = req.scope.resolve(Modules.ORDER)
-    const fulfillmentModuleService = req.scope.resolve(Modules.FULFILLMENT)
+    const pgConnection = req.scope.resolve(ContainerRegistrationKeys.PG_CONNECTION)
     const remoteQuery = req.scope.resolve("remoteQuery")
 
     try {
         // Get current order
         const order = await orderModuleService.retrieveOrder(id)
-
-        // Get order items for fulfillment creation
-        // Note: We'll skip fulfillment creation for now since line items require complex relation handling
-        const orderItems: any[] = []
 
         let updateData: any = {
             metadata: {
@@ -39,31 +35,28 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
             }
         }
 
-        // Handle status-specific updates
+        // Handle status-specific updates with direct DB changes for fulfillment
         switch (customStatus) {
             case 'shipped':
-                // Just update metadata, don't try to create fulfillment
-                // (Fulfillment creation requires complex setup with providers/locations)
-                console.log(`Order ${id} marked as shipped`)
+                await updateFulfillmentStatus(pgConnection, remoteQuery, id, 'shipped')
                 break
 
             case 'delivered':
+                await updateFulfillmentStatus(pgConnection, remoteQuery, id, 'delivered')
                 updateData.status = 'archived' // Archive delivered orders
-                console.log(`Order ${id} marked as delivered and archived`)
                 break
 
             case 'canceled':
+                await updateFulfillmentStatus(pgConnection, remoteQuery, id, 'canceled')
                 updateData.status = 'canceled'
                 updateData.canceled_at = new Date()
-                console.log(`Order ${id} canceled`)
                 break
 
             case 'refunded':
                 updateData.status = 'archived'
-                console.log(`Order ${id} marked as refunded and archived`)
                 break
 
-            // 'pending' and 'processing' don't need special handling
+            // 'pending' and 'processing' only update custom status in metadata
         }
 
         // Update order
@@ -78,129 +71,144 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     }
 }
 
-// Helper: Handle shipped status
-async function handleShippedStatus(orderId: string, orderItems: any[], fulfillmentService: any, remoteQuery: any) {
-    // Get existing fulfillments
-    const fulfillments = await getFulfillments(orderId, remoteQuery)
-
-    if (fulfillments.length === 0) {
-        // Get a stock location (required for fulfillment)
-        const locations = await remoteQuery({
-            entryPoint: "stock_location",
-            fields: ["id"],
-            variables: { take: 1 },
-        })
-
-        if (!locations || locations.length === 0) {
-            console.warn("No stock location found, skipping fulfillment creation")
-            return
-        }
-
-        // Get a fulfillment provider (required)
-        const providers = await remoteQuery({
-            entryPoint: "fulfillment_provider",
-            fields: ["id"],
-            variables: { take: 1 },
-        })
-
-        if (!providers || providers.length === 0) {
-            console.warn("No fulfillment provider found, skipping fulfillment creation")
-            return
-        }
-
-        // Create fulfillment
-        await fulfillmentService.createFulfillment({
-            location_id: locations[0].id,
-            provider_id: providers[0].id,
-            shipped_at: new Date(),
-        })
-    } else {
-        // Update existing fulfillment
-        await fulfillmentService.updateFulfillment(fulfillments[0].id, {
-            shipped_at: new Date(),
-        })
-    }
-}
-
-// Helper: Handle delivered status
-async function handleDeliveredStatus(orderId: string, orderItems: any[], fulfillmentService: any, remoteQuery: any) {
-    const fulfillments = await getFulfillments(orderId, remoteQuery)
-
-    if (fulfillments.length === 0) {
-        // Get a stock location (required for fulfillment)
-        const locations = await remoteQuery({
-            entryPoint: "stock_location",
-            fields: ["id"],
-            variables: { take: 1 },
-        })
-
-        if (!locations || locations.length === 0) {
-            console.warn("No stock location found, skipping fulfillment creation")
-            return
-        }
-
-        // Get a fulfillment provider (required)
-        const providers = await remoteQuery({
-            entryPoint: "fulfillment_provider",
-            fields: ["id"],
-            variables: { take: 1 },
-        })
-
-        if (!providers || providers.length === 0) {
-            console.warn("No fulfillment provider found, skipping fulfillment creation")
-            return
-        }
-
-        // Create fulfillment marked as delivered
-        await fulfillmentService.createFulfillment({
-            location_id: locations[0].id,
-            provider_id: providers[0].id,
-            shipped_at: new Date(),
-            delivered_at: new Date(),
-        })
-    } else {
-        // Update existing fulfillment as delivered
-        await fulfillmentService.updateFulfillment(fulfillments[0].id, {
-            shipped_at: fulfillments[0].shipped_at || new Date(),
-            delivered_at: new Date(),
-        })
-    }
-}
-
-// Helper: Cancel fulfillments
-async function cancelFulfillments(orderId: string, fulfillmentService: any, remoteQuery: any) {
-    const fulfillments = await getFulfillments(orderId, remoteQuery)
-
-    for (const fulfillment of fulfillments) {
-        if (!fulfillment.canceled_at) {
-            await fulfillmentService.updateFulfillment(fulfillment.id, {
-                canceled_at: new Date(),
-            })
-        }
-    }
-}
-
-// Helper: Get fulfillments for order
-async function getFulfillments(orderId: string, remoteQuery: any) {
+// Helper: Update fulfillment status via direct DB query
+async function updateFulfillmentStatus(pgConnection: any, remoteQuery: any, orderId: string, statusType: 'shipped' | 'delivered' | 'canceled') {
     try {
-        const result = await remoteQuery({
-            entryPoint: "order_fulfillment",
-            fields: ["fulfillment_id"],
-            variables: { filters: { order_id: orderId } },
-        })
+        // Get fulfillment ID linked to this order using Knex query builder
+        const fulfillments = await pgConnection('fulfillment')
+            .select('fulfillment.id')
+            .join('order_fulfillment', 'fulfillment.id', 'order_fulfillment.fulfillment_id')
+            .where('order_fulfillment.order_id', orderId)
+            .limit(1)
 
-        if (!result || result.length === 0) return []
+        let fulfillmentId: string
 
-        const fulfillmentIds = result.map((r: any) => r.fulfillment_id)
+        if (fulfillments.length === 0) {
+            // No fulfillment exists - create one
+            console.log(`📦 Creating fulfillment for order ${orderId}`)
 
-        const fulfillments = await remoteQuery({
-            entryPoint: "fulfillment",
-            fields: ["id", "shipped_at", "delivered_at", "canceled_at"],
-            variables: { filters: { id: fulfillmentIds } },
-        })
+            // Get stock location
+            const locations = await pgConnection('stock_location').select('id').limit(1)
 
-        return fulfillments || []
-    } catch {
-        return []
+            if (locations.length === 0) {
+                console.log(`❌ No stock location found, cannot create fulfillment`)
+                return
+            }
+
+            const locationId = locations[0].id
+
+            // Get fulfillment provider
+            const providers = await pgConnection('fulfillment_provider').select('id').limit(1)
+
+            if (providers.length === 0) {
+                console.log(`❌ No fulfillment provider found, cannot create fulfillment`)
+                return
+            }
+
+            const providerId = providers[0].id
+            const now = new Date().toISOString()
+
+            // Generate fulfillment ID (Medusa format)
+            fulfillmentId = `ful_${Date.now().toString(36)}${Math.random().toString(36).substr(2, 9)}`.toUpperCase()
+
+            // Create fulfillment record using Knex
+            await pgConnection('fulfillment').insert({
+                id: fulfillmentId,
+                location_id: locationId,
+                provider_id: providerId,
+                created_at: now,
+                updated_at: now
+            })
+
+            // Link fulfillment to order using Knex
+            const linkId = `orful_${Date.now().toString(36)}${Math.random().toString(36).substr(2, 9)}`.toUpperCase()
+            await pgConnection('order_fulfillment').insert({
+                id: linkId,
+                order_id: orderId,
+                fulfillment_id: fulfillmentId,
+                created_at: now,
+                updated_at: now
+            })
+
+            // Get order line items using remoteQuery (more reliable than direct SQL)
+            const orderWithItems = await remoteQuery({
+                entryPoint: "order",
+                fields: ["items.id", "items.title", "items.variant_id", "items.quantity", "items.variant_sku", "items.variant_barcode"],
+                variables: { filters: { id: orderId } },
+            })
+
+            const lineItems = orderWithItems && orderWithItems.length > 0 ? orderWithItems[0].items : []
+
+            // Create fulfillment items for each line item
+            for (const item of lineItems) {
+                const fulfillmentItemId = `fulit_${Date.now().toString(36)}${Math.random().toString(36).substr(2, 9)}`.toUpperCase()
+                await pgConnection('fulfillment_item').insert({
+                    id: fulfillmentItemId,
+                    fulfillment_id: fulfillmentId,
+                    line_item_id: item.id,
+                    title: item.title,
+                    sku: item.variant_sku || '',
+                    barcode: item.variant_barcode || '',
+                    quantity: item.quantity || 1,
+                    raw_quantity: JSON.stringify({ value: String(item.quantity || 1), precision: 20 }),
+                    created_at: now,
+                    updated_at: now
+                })
+
+                // Update order_item to mark as fulfilled
+                await pgConnection('order_item')
+                    .where('item_id', item.id)
+                    .where('order_id', orderId)
+                    .update({
+                        fulfilled_quantity: item.quantity || 1,
+                        raw_fulfilled_quantity: JSON.stringify({ value: String(item.quantity || 1), precision: 20 }),
+                        updated_at: now
+                    })
+            }
+
+            console.log(`✅ Created fulfillment ${fulfillmentId} for order ${orderId}`)
+        } else {
+            fulfillmentId = fulfillments[0].id
+            console.log(`📋 Found existing fulfillment ${fulfillmentId}`)
+        }
+
+        // Now update fulfillment timestamps based on status
+        let updateQuery = ''
+        const now = new Date().toISOString()
+
+        switch (statusType) {
+            case 'shipped':
+                await pgConnection('fulfillment')
+                    .where('id', fulfillmentId)
+                    .update({
+                        shipped_at: now,
+                        updated_at: now
+                    })
+                console.log(`✅ Fulfillment ${fulfillmentId} marked as shipped at ${now}`)
+                break
+
+            case 'delivered':
+                await pgConnection('fulfillment')
+                    .where('id', fulfillmentId)
+                    .update({
+                        shipped_at: pgConnection.raw('COALESCE(shipped_at, ?)', [now]),
+                        delivered_at: now,
+                        updated_at: now
+                    })
+                console.log(`✅ Fulfillment ${fulfillmentId} marked as delivered at ${now}`)
+                break
+
+            case 'canceled':
+                await pgConnection('fulfillment')
+                    .where('id', fulfillmentId)
+                    .update({
+                        canceled_at: now,
+                        updated_at: now
+                    })
+                console.log(`✅ Fulfillment ${fulfillmentId} canceled at ${now}`)
+                break
+        }
+    } catch (error) {
+        console.error(`❌ Error updating fulfillment status:`, error)
     }
 }

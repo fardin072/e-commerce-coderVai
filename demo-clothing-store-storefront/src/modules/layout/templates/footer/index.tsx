@@ -17,7 +17,7 @@ export default async function Footer() {
         <div className=" grid grid-cols-3 gap-3 small:gap-8 max-w-6xl mx-auto">
           {/* Payment methods strip */}
           <div className="flex w-full  flex-col gap-2">
-            <span className=" w-fit mx-auto "><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#373A3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-icon lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+            <span className=" w-fit mx-auto "><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#373A3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-icon lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg></span>
             <h1 className="text-[#373A3C] text-xl w-fit mx-auto font-semibold">All secure payment methods</h1>
             <Image
               src="/sslcommerz.png"
@@ -29,15 +29,15 @@ export default async function Footer() {
           </div>
           {/* Satisfaction guaranteed */}
           <div className="flex w-full  flex-col">
-            <span className=" w-fit mx-auto"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#373A3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-icon lucide-smile"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></svg></span>
+            <span className=" w-fit mx-auto"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#373A3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-smile-icon lucide-smile"><circle cx="12" cy="12" r="10" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><line x1="9" x2="9.01" y1="9" y2="9" /><line x1="15" x2="15.01" y1="9" y2="9" /></svg></span>
             <h1 className="text-[#373A3C] pt-2 text-xl mb-2 w-fit mx-auto font-semibold">Satisfaction guaranteed</h1>
-            
+
             <p className="text-[#373A3C] text-lg w-fit mx-auto font-medium">Made with premium quality materials.</p>
             <p className="text-[#373A3C] text-lg w-fit mx-auto font-semibold">Cozy yet lasts the test of time</p>
           </div>
           {/* Worldwide delivery */}
           <div className="flex w-full flex-col gap-2">
-            <span className=" w-fit mx-auto"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#373A3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck-electric-icon lucide-truck-electric"><path d="M14 19V7a2 2 0 0 0-2-2H9"/><path d="M15 19H9"/><path d="M19 19h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62L18.3 9.38a1 1 0 0 0-.78-.38H14"/><path d="M2 13v5a1 1 0 0 0 1 1h2"/><path d="M4 3 2.15 5.15a.495.495 0 0 0 .35.86h2.15a.47.47 0 0 1 .35.86L3 9.02"/><circle cx="17" cy="19" r="2"/><circle cx="7" cy="19" r="2"/></svg></span>
+            <span className=" w-fit mx-auto"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#373A3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-truck-electric-icon lucide-truck-electric"><path d="M14 19V7a2 2 0 0 0-2-2H9" /><path d="M15 19H9" /><path d="M19 19h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62L18.3 9.38a1 1 0 0 0-.78-.38H14" /><path d="M2 13v5a1 1 0 0 0 1 1h2" /><path d="M4 3 2.15 5.15a.495.495 0 0 0 .35.86h2.15a.47.47 0 0 1 .35.86L3 9.02" /><circle cx="17" cy="19" r="2" /><circle cx="7" cy="19" r="2" /></svg></span>
             <h1 className="text-[#373A3C] text-xl w-fit mx-auto font-semibold">Worldwide delivery</h1>
             <Image
               src="/delivery.png"
@@ -46,6 +46,31 @@ export default async function Footer() {
               height={75}
               className="w-full h-auto object-contain"
             />
+          </div>
+        </div>
+      </div>
+      <div className="py-10 bg-[#37383F] grid grid-cols-2">
+        <div className="flex flex-col max-w-6xl mx-auto">
+          <div className="flex gap-2 items-center">
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F7941E" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail-icon lucide-mail"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+            </div>
+            <div><h1 className="text-xl text-[#EBEBEB] font-semibold">GET SPECIAL DISCOUNTS IN YOUR INBOX</h1></div>
+          </div>
+          <div>
+            <div className="flex gap-3 items-center py-3">
+              <div className=" p-2 bg-[#F7941E]/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook-icon lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg></div>
+              <div className=" p-2 bg-[#F7941E]/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram-icon lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg></div>
+              <div className=" p-2 bg-[#F7941E]/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube-icon lucide-youtube"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" /><path d="m10 15 5-3-5-3z" /></svg></div>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <div><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#F7941E" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg></div>
+          <div>
+            <p className="text-xl text-[#EBEBEB] font-semibold">FOR ANY HELP YOU MAY CALL US AT</p>
+            <p className="text-xl text-[#AAAAAA]">+8809677666888</p>
+            <p className="text-xl text-[#AAAAAA]">Open 24 Hours a Day, 7 Days a week</p>
           </div>
         </div>
       </div>
@@ -62,19 +87,6 @@ export default async function Footer() {
             <p className="text-[#EBEBEB] text-xl font-light leading-relaxed">
               Discover our curated collection of premium clothing and accessories. Quality, style, and elegance in every piece.
             </p>
-            <div className="flex gap-3 items-center py-3">
-              <div className=" p-2 bg-[#F7941E]/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-facebook-icon lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" /></svg></div>
-              <div className=" p-2 bg-[#F7941E]/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram-icon lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></svg></div>
-              <div className=" p-2 bg-[#F7941E]/70 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-youtube-icon lucide-youtube"><path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" /><path d="m10 15 5-3-5-3z" /></svg></div>
-            </div>
-            <div className="flex gap-2 py-6">
-              <div><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#F7941E" stroke="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-icon lucide-phone"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></svg></div>
-              <div>
-                <p className="text-xl text-[#EBEBEB] font-semibold">FOR ANY HELP YOU MAY CALL US AT</p>
-                <p className="text-xl text-[#AAAAAA]">+8809677666888</p>
-                <p className="text-xl text-[#AAAAAA]">Open 24 Hours a Day, 7 Days a week</p>
-              </div>
-            </div>
           </div>
 
           {/* Categories */}

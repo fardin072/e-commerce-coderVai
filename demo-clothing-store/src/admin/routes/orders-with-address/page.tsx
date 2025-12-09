@@ -331,7 +331,7 @@ const OrdersWithAddressPage = () => {
   if (error) {
     return (
       <Container>
-        <Heading level="h1">Orders with Address</Heading>
+        <Heading level="h1">Orders Manager</Heading>
         <div className="mt-4 text-red-600">
           Error loading orders: {error instanceof Error ? error.message : "Unknown error"}
         </div>
@@ -345,7 +345,7 @@ const OrdersWithAddressPage = () => {
   return (
     <Container>
       <div className="flex items-center justify-between mb-6">
-        <Heading level="h1">Orders with Address</Heading>
+        <Heading level="h1">Orders Manager</Heading>
         <Text size="small" className="text-gray-500">
           Total: {count}
         </Text>
@@ -637,7 +637,7 @@ const OrdersWithAddressPage = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "Orders with Address",
+  label: "Orders Manager",
 })
 
 export default OrdersWithAddressPage

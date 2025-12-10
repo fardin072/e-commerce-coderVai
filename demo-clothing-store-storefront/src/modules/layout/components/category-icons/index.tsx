@@ -89,6 +89,10 @@ export const DefaultIcon = ({ size = 24, className = "" }: CategoryIconProps) =>
   <Package size={size} className={className} strokeWidth={1.5} />
 )
 
+// export const FacebookIcon = ({ size = 24, className = "" }: CategoryIconProps) => (
+//   <FacebookIcon size={size} className={className} strokeWidth={1.5} />
+// )
+
 // Mapping category names to icons
 const categoryIconMap: Record<string, React.ComponentType<CategoryIconProps>> = {
   // Fixed Categories

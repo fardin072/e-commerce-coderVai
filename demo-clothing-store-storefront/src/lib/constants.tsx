@@ -48,6 +48,13 @@ export const isStripeLike = (providerId?: string) => {
   )
 }
 
+/* Social Media Links */
+export const socialMediaLinks = {
+  facebook: "https://www.facebook.com/zahanfashion",
+  instagram: "https://www.instagram.com/zahanfashion",
+  youtube: "https://www.youtube.com/@zahanfashion",
+}
+
 export const isPaypal = (providerId?: string) => {
   return providerId?.startsWith("pp_paypal")
 }

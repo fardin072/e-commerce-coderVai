@@ -113,6 +113,29 @@
       background-position: 1000px 0;
     }
   }
+
+  @keyframes neon-rgb-border {
+    0% {
+      border-color: rgb(255, 0, 127);
+      box-shadow: 0 0 10px rgba(255, 0, 127, 0.8), inset 0 0 10px rgba(255, 0, 127, 0.3);
+    }
+    25% {
+      border-color: rgb(0, 255, 127);
+      box-shadow: 0 0 10px rgba(0, 255, 127, 0.8), inset 0 0 10px rgba(0, 255, 127, 0.3);
+    }
+    50% {
+      border-color: rgb(0, 127, 255);
+      box-shadow: 0 0 10px rgba(0, 127, 255, 0.8), inset 0 0 10px rgba(0, 127, 255, 0.3);
+    }
+    75% {
+      border-color: rgb(255, 127, 0);
+      box-shadow: 0 0 10px rgba(255, 127, 0, 0.8), inset 0 0 10px rgba(255, 127, 0, 0.3);
+    }
+    100% {
+      border-color: rgb(255, 0, 127);
+      box-shadow: 0 0 10px rgba(255, 0, 127, 0.8), inset 0 0 10px rgba(255, 0, 127, 0.3);
+    }
+  }
 }
 
 @layer utilities {
@@ -164,6 +187,10 @@
 
   .animate-shimmer {
     animation: shimmer 2s infinite;
+  }
+
+  .animate-neon-rgb-border {
+    animation: neon-rgb-border 3s infinite;
   }
 
   .group-hover\:scale-105:hover {

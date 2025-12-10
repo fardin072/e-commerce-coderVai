@@ -46,9 +46,18 @@ export async function prepareCheckout(currentState: unknown, formData: FormData)
         const countryCode = formData.get("shipping_address.country_code") as string
         const shippingMethodId = formData.get("shipping_method_id") as string
         const paymentProviderId = formData.get("payment_provider_id") as string
-        const sameAsBilling = formData.get("same_as_billing") === "on"
+        const sameAsBilling = formData.get("same_as_billing") === "on" || formData.get("same_as_billing") === "true"
+
+        // Handle full name field
+        const fullName = (formData.get("shipping_address.full_name") as string || "").trim()
+        const nameParts = fullName.split(' ')
+        const firstName = nameParts[0] || fullName
+        const lastName = nameParts.slice(1).join(' ') || firstName
 
         // Validate required fields
+        if (!fullName) {
+            throw new Error("Full name is required")
+        }
         if (!countryCode) {
             throw new Error("Country is required")
         }
@@ -62,37 +71,19 @@ export async function prepareCheckout(currentState: unknown, formData: FormData)
         // Step 1: Update cart with addresses and email
         const addressData: HttpTypes.StoreUpdateCart = {
             shipping_address: {
-                first_name: formData.get("shipping_address.first_name") as string,
-                last_name: formData.get("shipping_address.last_name") as string,
+                first_name: firstName,
+                last_name: lastName,
                 address_1: formData.get("shipping_address.address_1") as string,
                 address_2: "",
-                company: formData.get("shipping_address.company") as string || undefined,
-                postal_code: formData.get("shipping_address.postal_code") as string,
                 city: formData.get("shipping_address.city") as string,
                 country_code: countryCode,
-                province: formData.get("shipping_address.province") as string || undefined,
                 phone: formData.get("shipping_address.phone") as string,
             },
             email: formData.get("email") as string,
         }
 
-        // Set billing address (same as shipping or separate)
-        if (sameAsBilling) {
-            addressData.billing_address = addressData.shipping_address
-        } else {
-            addressData.billing_address = {
-                first_name: formData.get("billing_address.first_name") as string,
-                last_name: formData.get("billing_address.last_name") as string,
-                address_1: formData.get("billing_address.address_1") as string,
-                address_2: "",
-                company: formData.get("billing_address.company") as string || undefined,
-                postal_code: formData.get("billing_address.postal_code") as string,
-                city: formData.get("billing_address.city") as string,
-                country_code: formData.get("billing_address.country_code") as string,
-                province: formData.get("billing_address.province") as string || undefined,
-                phone: formData.get("billing_address.phone") as string,
-            }
-        }
+        // Set billing address (always same as shipping now)
+        addressData.billing_address = addressData.shipping_address
 
         await sdk.store.cart.update(cartId, addressData, {}, headers)
 

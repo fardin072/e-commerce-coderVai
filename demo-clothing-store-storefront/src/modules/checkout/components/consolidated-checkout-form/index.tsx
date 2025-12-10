@@ -2,12 +2,11 @@
 
 import { CheckCircleSolid } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
-import { Heading, Text, useToggleState } from "@medusajs/ui"
+import { Heading, Text } from "@medusajs/ui"
 import { useActionState, useEffect, useState } from "react"
 import { prepareCheckout } from "@lib/data/checkout"
 import { listCartShippingMethods } from "@lib/data/fulfillment"
 import { listCartPaymentMethods } from "@lib/data/payment"
-import BillingAddress from "@modules/checkout/components/billing_address"
 import ShippingAddress from "@modules/checkout/components/shipping-address"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
@@ -44,12 +43,6 @@ export default function ConsolidatedCheckoutForm({
     >(null)
     const [cardComplete, setCardComplete] = useState(false)
     const [selectedShippingCost, setSelectedShippingCost] = useState<number>(0)
-
-    const { state: sameAsBilling, toggle: toggleSameAsBilling } = useToggleState(
-        cart?.shipping_address && cart?.billing_address
-            ? cart.shipping_address.address_1 === cart.billing_address.address_1
-            : true
-    )
 
     // Restore form state from localStorage on mount (for coupon application refreshes)
     useEffect(() => {
@@ -131,19 +124,10 @@ export default function ConsolidatedCheckoutForm({
                 <div className="pb-8">
                     <ShippingAddress
                         customer={customer}
-                        checked={sameAsBilling}
-                        onChange={toggleSameAsBilling}
+                        checked={true}
+                        onChange={() => { }}
                         cart={cart}
                     />
-
-                    {!sameAsBilling && (
-                        <div>
-                            <Heading level="h2" className="text-3xl-regular gap-x-4 pb-6 pt-8">
-                                Billing address
-                            </Heading>
-                            <BillingAddress cart={cart} />
-                        </div>
-                    )}
                 </div>
                 <Divider />
             </div>

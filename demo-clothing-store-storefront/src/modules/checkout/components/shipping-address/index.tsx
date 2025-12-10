@@ -92,6 +92,40 @@ const ShippingAddress = ({
     })
   }
 
+  // Auto-save address to cart with debouncing (1 second after last keystroke)
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      // Only auto-save if we have essential fields filled
+      if (formData["shipping_address.first_name"] &&
+        formData["shipping_address.last_name"] &&
+        formData["shipping_address.address_1"] &&
+        formData["shipping_address.city"] &&
+        formData["shipping_address.country_code"] &&
+        formData.email) {
+
+        // Import auto-save function dynamically to avoid bundling issues
+        const { autoSaveAddress } = await import("@lib/data/autosave")
+
+        await autoSaveAddress({
+          shipping_address: {
+            first_name: formData["shipping_address.first_name"],
+            last_name: formData["shipping_address.last_name"],
+            address_1: formData["shipping_address.address_1"],
+            company: formData["shipping_address.company"] || undefined,
+            postal_code: formData["shipping_address.postal_code"],
+            city: formData["shipping_address.city"],
+            country_code: formData["shipping_address.country_code"],
+            province: formData["shipping_address.province"] || undefined,
+            phone: formData["shipping_address.phone"],
+          },
+          email: formData.email,
+        })
+      }
+    }, 1000) // Debounce for 1 second
+
+    return () => clearTimeout(timer)
+  }, [formData])
+
   return (
     <>
       {customer && (addressesInRegion?.length || 0) > 0 && (

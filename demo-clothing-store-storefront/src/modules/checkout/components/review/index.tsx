@@ -1,12 +1,13 @@
 "use client"
 
 import { Heading, Text, clx } from "@medusajs/ui"
-
 import PaymentButton from "../payment-button"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter, usePathname } from "next/navigation"
 
 const Review = ({ cart }: { cart: any }) => {
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
 
   const isOpen = searchParams.get("step") === "review"
 
@@ -17,6 +18,10 @@ const Review = ({ cart }: { cart: any }) => {
     cart.shipping_address &&
     cart.shipping_methods.length > 0 &&
     (cart.payment_collection || paidByGiftcard)
+
+  const handleEdit = () => {
+    router.push(pathname)
+  }
 
   return (
     <div className="bg-white">
@@ -32,6 +37,17 @@ const Review = ({ cart }: { cart: any }) => {
         >
           Review
         </Heading>
+        {isOpen && previousStepsCompleted && (
+          <Text>
+            <button
+              onClick={handleEdit}
+              className="text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+              data-testid="edit-checkout-button"
+            >
+              Edit
+            </button>
+          </Text>
+        )}
       </div>
       {isOpen && previousStepsCompleted && (
         <>

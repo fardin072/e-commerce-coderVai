@@ -1,7 +1,7 @@
 "use client"
 
 import { convertToLocale } from "@lib/util/money"
-import React from "react"
+import React, { useMemo } from "react"
 
 type CartTotalsProps = {
   totals: {
@@ -13,9 +13,10 @@ type CartTotalsProps = {
     shipping_subtotal?: number | null
     discount_subtotal?: number | null
   }
+  shippingOverride?: number // For instant UI update when selecting shipping
 }
 
-const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
+const CartTotals: React.FC<CartTotalsProps> = ({ totals, shippingOverride }) => {
   const {
     currency_code,
     total,
@@ -24,6 +25,18 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
     shipping_subtotal,
     discount_subtotal,
   } = totals
+
+  // If shippingOverride is provided, use it instead of server shipping_subtotal
+  const displayShipping = shippingOverride !== undefined ? shippingOverride : (shipping_subtotal ?? 0)
+
+  // Recalculate total when using shipping override
+  const displayTotal = useMemo(() => {
+    if (shippingOverride !== undefined) {
+      // Recalculate: subtotal + shipping - discount + tax
+      return (item_subtotal ?? 0) + displayShipping - (discount_subtotal ?? 0) + (tax_total ?? 0)
+    }
+    return total ?? 0
+  }, [shippingOverride, item_subtotal, displayShipping, discount_subtotal, tax_total, total])
 
   return (
     <div>
@@ -36,8 +49,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
         </div>
         <div className="flex items-center justify-between">
           <span>Shipping</span>
-          <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
-            {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+          <span data-testid="cart-shipping" data-value={displayShipping}>
+            {convertToLocale({ amount: displayShipping, currency_code })}
           </span>
         </div>
         {!!discount_subtotal && (
@@ -69,9 +82,9 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
         <span
           className="txt-xlarge-plus"
           data-testid="cart-total"
-          data-value={total || 0}
+          data-value={displayTotal}
         >
-          {convertToLocale({ amount: total ?? 0, currency_code })}
+          {convertToLocale({ amount: displayTotal, currency_code })}
         </span>
       </div>
       <div className="h-px w-full border-b border-grey-20 mt-4" />

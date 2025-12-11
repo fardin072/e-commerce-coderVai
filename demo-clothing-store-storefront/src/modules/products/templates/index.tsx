@@ -67,10 +67,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     sku: product.sku || product.id,
     weight: product.weight
       ? {
-          "@type": "QuantitativeValue",
-          value: product.weight,
-          unitCode: "GRM",
-        }
+        "@type": "QuantitativeValue",
+        value: product.weight,
+        unitCode: "GRM",
+      }
       : undefined,
     material: product.material || undefined,
   }
@@ -114,7 +114,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
           {/* Product Container */}
           <div
-            className="grid grid-cols-1 gap-3 w-[80%] mx-auto small:grid-cols-2 mb-12 small:mb-16 medium:mb-20"
+            className="grid grid-cols-1 gap-3 w-full small:w-[80%] mx-auto small:grid-cols-2 mb-6 small:mb-12 medium:mb-16"
             data-testid="product-container"
           >
             {/* Product Images - Full width on mobile, 2/3 on desktop */}

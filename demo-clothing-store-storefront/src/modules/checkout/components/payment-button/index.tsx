@@ -202,25 +202,6 @@ const SSLCommerzPaymentButton = ({
         console.log(`[SSLCommerz] Stored cart ID in localStorage: ${cart.id}`)
       }
 
-      // Production debugging - log full session data
-      console.log(`[SSLCommerz] ========== GATEWAY DEBUG INFO ==========`)
-      console.log(`[SSLCommerz] Selected gateway preference:`, selectedGateway)
-      console.log(`[SSLCommerz] Gateway list exists:`, !!gatewayList)
-      console.log(`[SSLCommerz] Gateway list length:`, gatewayList?.length)
-      console.log(`[SSLCommerz] Gateway list type:`, Array.isArray(gatewayList) ? 'array' : typeof gatewayList)
-
-      if (gatewayList && gatewayList.length > 0) {
-        console.log(`[SSLCommerz] Available gateways:`, gatewayList.map((g: any) => ({
-          name: g.name,
-          gw: g.gw,
-          type: g.type,
-          hasRedirectUrl: !!g.redirectGatewayURL
-        })))
-      } else {
-        console.error(`[SSLCommerz] ⚠️ Gateway list is empty or undefined!`)
-      }
-      console.log(`[SSLCommerz] ==========================================`)
-
       let redirectUrl = gatewayUrl
 
       // If a specific gateway was selected (bkash or nagad), try to find its direct URL
@@ -237,21 +218,11 @@ const SSLCommerzPaymentButton = ({
         } else {
           console.log(`[SSLCommerz] No redirectGatewayURL found for ${selectedGateway}, using default gateway page`)
         }
-      } else if (selectedGateway && (!gatewayList || gatewayList.length === 0)) {
-        // FALLBACK: Gateway list is empty in production
-        // Try appending cardname parameter to main gateway URL (works in some SSLCommerz configs)
-        console.warn(`[SSLCommerz] ⚠️ Using fallback method: appending cardname parameter`)
-        redirectUrl = `${gatewayUrl}${gatewayUrl.includes('?') ? '&' : '?'}cardname=${selectedGateway}`
-        console.log(`[SSLCommerz] Fallback URL: ${redirectUrl}`)
       } else {
         console.log(`[SSLCommerz] No specific gateway selected, using default gateway page`)
       }
 
       console.log(`[SSLCommerz] Redirecting to: ${redirectUrl}`)
-
-      // TEMPORARY: Alert to give time to check console logs
-      // Remove this after debugging production issue
-      alert(`⚠️ DEBUGGING: Check console logs now!\n\nSelected: ${selectedGateway || 'default'}\nGateway list length: ${gatewayList?.length || 0}\n\nClick OK to continue redirect...`)
 
       // Redirect to the selected gateway
       window.location.href = redirectUrl

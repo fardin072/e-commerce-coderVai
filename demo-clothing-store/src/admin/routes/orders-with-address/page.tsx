@@ -328,6 +328,277 @@ const OrdersWithAddressPage = () => {
     }
   }
 
+  // Handle print order - triggers print dialog directly without opening new window
+  const handlePrint = async (order: any, e: React.MouseEvent) => {
+    e.stopPropagation() // Prevent row click navigation
+
+    try {
+      // Use the order data we already have from the table
+      console.log("Order data for print:", order)
+      console.log("Payment provider:", order.payment_provider)
+
+      if (!order) {
+        alert("Failed to load order details")
+        return
+      }
+
+      const address = order.shipping_address || order.billing_address
+
+      const formatCurrency = (amount: number, currency?: string) => {
+        const currencyCode = currency || order.currency_code || "BDT"
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: currencyCode,
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(amount)
+      }
+
+      // Format payment method from provider ID
+      const formatPaymentMethod = () => {
+        if (!order.payment_provider) return "N/A"
+
+        const providerId = order.payment_provider.toLowerCase()
+
+        if (providerId.includes("sslcommerz")) {
+          return "SSLCommerz"
+        } else if (providerId.includes("manual")) {
+          return "Manual/COD"
+        } else if (providerId.includes("cod") || providerId.includes("system")) {
+          return "COD"
+        } else {
+          const match = providerId.match(/pp_(\w+)_/)
+          if (match && match[1]) {
+            return match[1].charAt(0).toUpperCase() + match[1].slice(1)
+          }
+          return "Other"
+        }
+      }
+
+      // Generate print HTML
+      const printHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Order #${order.display_id}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              padding: 40px;
+              max-width: 900px;
+              margin: 0 auto;
+            }
+            .invoice-header {
+              border-bottom: 2px solid #333;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
+            }
+            .invoice-title {
+              font-size: 32px;
+              font-weight: bold;
+              margin-bottom: 10px;
+            }
+            .section-title {
+              font-size: 18px;
+              font-weight: bold;
+              margin-top: 20px;
+              margin-bottom: 10px;
+              border-bottom: 1px solid #ccc;
+              padding-bottom: 5px;
+            }
+            .info-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 8px;
+            }
+            .info-label {
+              font-weight: bold;
+              width: 150px;
+            }
+            .items-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+            }
+            .items-table th,
+            .items-table td {
+              border: 1px solid #ddd;
+              padding: 12px;
+              text-align: left;
+            }
+            .items-table th {
+              background-color: #f5f5f5;
+              font-weight: bold;
+            }
+            .total-section {
+              margin-top: 30px;
+              border-top: 2px solid #333;
+              padding-top: 20px;
+            }
+            .total-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 8px;
+              font-size: 16px;
+            }
+            .grand-total {
+              font-size: 20px;
+              font-weight: bold;
+              margin-top: 10px;
+            }
+            @media print {
+              body {
+                padding: 20px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-header">
+            <div class="invoice-title">ORDER INVOICE</div>
+            <div class="info-row">
+              <span class="info-label">Order Number:</span>
+              <span>#${order.display_id}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Order Date:</span>
+              <span>${new Date(order.created_at).toLocaleString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status:</span>
+              <span style="text-transform: capitalize">${order.metadata?.custom_status || order.status}</span>
+            </div>
+          </div>
+
+          <div class="section-title">Customer Information</div>
+          <div class="info-row">
+            <span class="info-label">Name:</span>
+            <span>${address?.first_name || ""} ${address?.last_name || ""}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Email:</span>
+            <span>${order.email || "N/A"}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone:</span>
+            <span>${address?.phone || "N/A"}</span>
+          </div>
+
+          <div class="section-title">Shipping Address</div>
+          <div style="margin-left: 20px;">
+            ${address?.first_name || ""} ${address?.last_name || ""}<br/>
+            ${address?.address_1 || ""}<br/>
+            ${address?.address_2 ? address.address_2 + "<br/>" : ""}
+            ${address?.city || ""}, ${address?.province || ""} ${address?.postal_code || ""}<br/>
+            ${address?.country_code?.toUpperCase() || ""}
+          </div>
+
+          <div class="section-title">Order Items</div>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Variant</th>
+                <th style="text-align: center">Quantity</th>
+                <th style="text-align: right">Unit Price</th>
+                <th style="text-align: right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${order.items?.map((item: any) => `
+                <tr>
+                  <td>${item.title}</td>
+                  <td>${item.variant?.title || "N/A"}</td>
+                  <td style="text-align: center">${item.quantity}</td>
+                  <td style="text-align: right">${formatCurrency(item.unit_price || 0)}</td>
+                  <td style="text-align: right">${formatCurrency((item.unit_price || 0) * item.quantity)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+
+          <div class="total-section">
+            <div class="total-row">
+              <span>Subtotal:</span>
+              <span>${formatCurrency(order.summary?.subtotal || 0)}</span>
+            </div>
+            ${order.summary?.shipping_total > 0 ? `
+            <div class="total-row">
+              <span>Shipping:</span>
+              <span>${formatCurrency(order.summary.shipping_total)}</span>
+            </div>
+            ` : ""}
+            ${order.summary?.tax_total > 0 ? `
+            <div class="total-row">
+              <span>Tax:</span>
+              <span>${formatCurrency(order.summary.tax_total)}</span>
+            </div>
+            ` : ""}
+            ${order.summary?.discount_total > 0 ? `
+            <div class="total-row">
+              <span>Discount:</span>
+              <span>-${formatCurrency(order.summary.discount_total)}</span>
+            </div>
+            ` : ""}
+            <div class="total-row grand-total">
+              <span>GRAND TOTAL:</span>
+              <span>${formatCurrency(order.summary?.current_order_total || order.summary?.accounting_total || 0)}</span>
+            </div>
+          </div>
+
+          <div class="section-title">Payment Information</div>
+          <div class="info-row">
+            <span class="info-label">Payment Status:</span>
+            <span style="text-transform: capitalize">${order.payment_status === "completed" ? "Captured" : order.payment_status}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Payment Method:</span>
+            <span>${formatPaymentMethod()}</span>
+          </div>
+
+          <script>
+            window.onload = function() {
+              window.print();
+              // Close window after print dialog is closed
+              window.onafterprint = function() {
+                window.close();
+              }
+            }
+          </script>
+        </body>
+        </html>
+      `
+
+      // Create hidden iframe
+      const iframe = document.createElement('iframe')
+      iframe.style.display = 'none'
+      document.body.appendChild(iframe)
+
+      // Write content and trigger print
+      const iframeDoc = iframe.contentWindow?.document
+      if (iframeDoc) {
+        iframeDoc.open()
+        iframeDoc.write(printHTML)
+        iframeDoc.close()
+      }
+
+      // Clean up iframe after printing
+      setTimeout(() => {
+        document.body.removeChild(iframe)
+      }, 1000)
+
+    } catch (error) {
+      console.error("Error printing order:", error)
+      alert("Failed to print order")
+    }
+  }
+
   if (error) {
     return (
       <Container>
@@ -477,12 +748,13 @@ const OrdersWithAddressPage = () => {
               <Table.HeaderCell>Payment Method</Table.HeaderCell>
               <Table.HeaderCell>Total</Table.HeaderCell>
               <Table.HeaderCell>Date</Table.HeaderCell>
+              <Table.HeaderCell>Print</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {isLoading ? (
               <Table.Row>
-                <td colSpan={9} className="text-center py-8">
+                <td colSpan={11} className="text-center py-8">
                   <Text size="small" className="text-gray-500">
                     Loading...
                   </Text>
@@ -490,7 +762,7 @@ const OrdersWithAddressPage = () => {
               </Table.Row>
             ) : orders.length === 0 ? (
               <Table.Row>
-                <td colSpan={9} className="text-center py-8">
+                <td colSpan={11} className="text-center py-8">
                   <Text size="small" className="text-gray-500">
                     No orders found
                   </Text>
@@ -595,6 +867,15 @@ const OrdersWithAddressPage = () => {
                           })
                           : "N/A"}
                       </Text>
+                    </Table.Cell>
+                    <Table.Cell onClick={(e) => e.stopPropagation()}>
+                      <Button
+                        size="small"
+                        variant="secondary"
+                        onClick={(e) => handlePrint(order, e)}
+                      >
+                        Print
+                      </Button>
                     </Table.Cell>
                   </Table.Row>
                 )

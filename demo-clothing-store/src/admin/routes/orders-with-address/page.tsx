@@ -101,6 +101,24 @@ const OrdersWithAddressPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [showColumnSelector])
 
+  // Sync top scrollbar width with table width
+  useEffect(() => {
+    const syncScrollbarWidth = () => {
+      const table = document.querySelector('.table-scroll-bottom table') as HTMLElement
+      const topScrollContent = document.querySelector('.top-scroll-content') as HTMLElement
+      if (table && topScrollContent) {
+        topScrollContent.style.width = `${table.scrollWidth}px`
+      }
+    }
+
+    // Sync on mount and when data changes
+    syncScrollbarWidth()
+
+    // Re-sync when window resizes
+    window.addEventListener('resize', syncScrollbarWidth)
+    return () => window.removeEventListener('resize', syncScrollbarWidth)
+  }, [data, visibleColumns])
+
   // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -899,7 +917,35 @@ const OrdersWithAddressPage = () => {
         )}
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Top Scrollbar */}
+      <div
+        className="overflow-x-auto w-full mb-2"
+        style={{ maxWidth: '100%' }}
+        onScroll={(e) => {
+          const target = e.target as HTMLDivElement
+          const bottom = document.querySelector('.table-scroll-bottom') as HTMLDivElement
+          if (bottom && bottom.scrollLeft !== target.scrollLeft) {
+            bottom.scrollLeft = target.scrollLeft
+          }
+        }}
+      >
+        <div className="h-1" style={{ width: 'fit-content', minWidth: '100%' }}>
+          <div className="top-scroll-content" style={{ width: '2000px', height: '1px' }}></div>
+        </div>
+      </div>
+
+      {/* Table with Bottom Scrollbar */}
+      <div
+        className="overflow-x-auto w-full table-scroll-bottom"
+        style={{ maxWidth: '100%' }}
+        onScroll={(e) => {
+          const target = e.target as HTMLDivElement
+          const top = document.querySelector('.overflow-x-auto') as HTMLDivElement
+          if (top && top.scrollLeft !== target.scrollLeft) {
+            top.scrollLeft = target.scrollLeft
+          }
+        }}
+      >
         <Table>
           <Table.Header>
             <Table.Row>
@@ -1061,12 +1107,21 @@ const OrdersWithAddressPage = () => {
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
                               ✓
                             </span>
-                            <span className="text-xs text-gray-500">
-                              {new Date(order.metadata.printed_at).toLocaleString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </span>
+                            <div className="flex flex-col">
+                              <span className="text-xs text-gray-500">
+                                {new Date(order.metadata.printed_at).toLocaleString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
+                              <span className="text-xs text-gray-400 whitespace-nowrap">
+                                {new Date(order.metadata.printed_at).toLocaleString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                  hour12: true,
+                                })}
+                              </span>
+                            </div>
                           </div>
                         ) : (
                           <span className="text-xs text-gray-400">—</span>

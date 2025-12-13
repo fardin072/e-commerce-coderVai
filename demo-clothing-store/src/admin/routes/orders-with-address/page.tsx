@@ -332,20 +332,35 @@ const OrdersWithAddressPage = () => {
   const handlePrint = async (order: any, e: React.MouseEvent) => {
     e.stopPropagation() // Prevent row click navigation
 
-    try {
-      // Use the order data we already have from the table
-      console.log("Order data for print:", order)
-      console.log("Payment provider:", order.payment_provider)
+    // Debug: Log full order data
+    console.log("=== FULL ORDER DATA FOR PRINTING ===")
+    console.log("Complete order object:", JSON.stringify(order, null, 2))
+    console.log("Payment provider:", order.payment_provider)
+    console.log("Email:", order.email)
+    console.log("Customer email:", order.customer?.email)
+    console.log("Shipping address:", order.shipping_address)
+    console.log("Billing address:", order.billing_address)
+    console.log("Summary:", order.summary)
+    console.log("Items:", order.items)
+    console.log("=====================================")
 
-      if (!order) {
-        alert("Failed to load order details")
-        return
+    try {
+      // Fetch order items (not included in orders-with-address endpoint)
+      const itemsResponse = await fetch(`/admin/orders/${order.id}`, {
+        credentials: "include",
+      })
+      const itemsData = await itemsResponse.json()
+
+      // Merge items into order object
+      const fullOrder = {
+        ...order,
+        items: itemsData.order?.items || []
       }
 
-      const address = order.shipping_address || order.billing_address
+      const address = fullOrder.shipping_address || fullOrder.billing_address
 
       const formatCurrency = (amount: number, currency?: string) => {
-        const currencyCode = currency || order.currency_code || "BDT"
+        const currencyCode = currency || fullOrder.currency_code || "BDT"
         return new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: currencyCode,
@@ -355,10 +370,10 @@ const OrdersWithAddressPage = () => {
       }
 
       // Format payment method from provider ID
-      const formatPaymentMethod = () => {
-        if (!order.payment_provider) return "N/A"
+      const getPaymentMethod = () => {
+        if (!fullOrder.payment_provider) return "N/A"
 
-        const providerId = order.payment_provider.toLowerCase()
+        const providerId = fullOrder.payment_provider.toLowerCase()
 
         if (providerId.includes("sslcommerz")) {
           return "SSLCommerz"
@@ -380,7 +395,7 @@ const OrdersWithAddressPage = () => {
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Order #${order.display_id}</title>
+          <title>Order #${fullOrder.display_id}</title>
           <style>
             body {
               font-family: Arial, sans-serif;
@@ -458,11 +473,11 @@ const OrdersWithAddressPage = () => {
             <div class="invoice-title">ORDER INVOICE</div>
             <div class="info-row">
               <span class="info-label">Order Number:</span>
-              <span>#${order.display_id}</span>
+              <span>#${fullOrder.display_id}</span>
             </div>
             <div class="info-row">
               <span class="info-label">Order Date:</span>
-              <span>${new Date(order.created_at).toLocaleString("en-US", {
+              <span>${new Date(fullOrder.created_at).toLocaleString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -472,7 +487,7 @@ const OrdersWithAddressPage = () => {
             </div>
             <div class="info-row">
               <span class="info-label">Status:</span>
-              <span style="text-transform: capitalize">${order.metadata?.custom_status || order.status}</span>
+              <span style="text-transform: capitalize">${fullOrder.metadata?.custom_status || fullOrder.status}</span>
             </div>
           </div>
 
@@ -483,7 +498,7 @@ const OrdersWithAddressPage = () => {
           </div>
           <div class="info-row">
             <span class="info-label">Email:</span>
-            <span>${order.email || "N/A"}</span>
+            <span>${fullOrder.email || "N/A"}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Phone:</span>
@@ -511,7 +526,7 @@ const OrdersWithAddressPage = () => {
               </tr>
             </thead>
             <tbody>
-              ${order.items?.map((item: any) => `
+              ${fullOrder.items?.map((item: any) => `
                 <tr>
                   <td>${item.title}</td>
                   <td>${item.variant?.title || "N/A"}</td>
@@ -524,42 +539,20 @@ const OrdersWithAddressPage = () => {
           </table>
 
           <div class="total-section">
-            <div class="total-row">
-              <span>Subtotal:</span>
-              <span>${formatCurrency(order.summary?.subtotal || 0)}</span>
-            </div>
-            ${order.summary?.shipping_total > 0 ? `
-            <div class="total-row">
-              <span>Shipping:</span>
-              <span>${formatCurrency(order.summary.shipping_total)}</span>
-            </div>
-            ` : ""}
-            ${order.summary?.tax_total > 0 ? `
-            <div class="total-row">
-              <span>Tax:</span>
-              <span>${formatCurrency(order.summary.tax_total)}</span>
-            </div>
-            ` : ""}
-            ${order.summary?.discount_total > 0 ? `
-            <div class="total-row">
-              <span>Discount:</span>
-              <span>-${formatCurrency(order.summary.discount_total)}</span>
-            </div>
-            ` : ""}
             <div class="total-row grand-total">
-              <span>GRAND TOTAL:</span>
-              <span>${formatCurrency(order.summary?.current_order_total || order.summary?.accounting_total || 0)}</span>
+              <span>TOTAL:</span>
+              <span>${formatCurrency(fullOrder.summary?.current_order_total || fullOrder.summary?.accounting_total || 0)}</span>
             </div>
           </div>
 
           <div class="section-title">Payment Information</div>
           <div class="info-row">
             <span class="info-label">Payment Status:</span>
-            <span style="text-transform: capitalize">${order.payment_status === "completed" ? "Captured" : order.payment_status}</span>
+            <span style="text-transform: capitalize">${fullOrder.payment_status === "completed" ? "Captured" : fullOrder.payment_status}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Payment Method:</span>
-            <span>${formatPaymentMethod()}</span>
+            <span>${getPaymentMethod()}</span>
           </div>
 
           <script>

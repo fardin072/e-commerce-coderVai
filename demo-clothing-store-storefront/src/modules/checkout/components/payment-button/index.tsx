@@ -202,6 +202,25 @@ const SSLCommerzPaymentButton = ({
         console.log(`[SSLCommerz] Stored cart ID in localStorage: ${cart.id}`)
       }
 
+      // Production debugging - log full session data
+      console.log(`[SSLCommerz] ========== GATEWAY DEBUG INFO ==========`)
+      console.log(`[SSLCommerz] Selected gateway preference:`, selectedGateway)
+      console.log(`[SSLCommerz] Gateway list exists:`, !!gatewayList)
+      console.log(`[SSLCommerz] Gateway list length:`, gatewayList?.length)
+      console.log(`[SSLCommerz] Gateway list type:`, Array.isArray(gatewayList) ? 'array' : typeof gatewayList)
+
+      if (gatewayList && gatewayList.length > 0) {
+        console.log(`[SSLCommerz] Available gateways:`, gatewayList.map((g: any) => ({
+          name: g.name,
+          gw: g.gw,
+          type: g.type,
+          hasRedirectUrl: !!g.redirectGatewayURL
+        })))
+      } else {
+        console.error(`[SSLCommerz] ⚠️ Gateway list is empty or undefined!`)
+      }
+      console.log(`[SSLCommerz] ==========================================`)
+
       let redirectUrl = gatewayUrl
 
       // If a specific gateway was selected (bkash or nagad), try to find its direct URL

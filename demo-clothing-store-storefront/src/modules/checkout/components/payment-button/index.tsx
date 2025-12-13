@@ -237,11 +237,21 @@ const SSLCommerzPaymentButton = ({
         } else {
           console.log(`[SSLCommerz] No redirectGatewayURL found for ${selectedGateway}, using default gateway page`)
         }
+      } else if (selectedGateway && (!gatewayList || gatewayList.length === 0)) {
+        // FALLBACK: Gateway list is empty in production
+        // Try appending cardname parameter to main gateway URL (works in some SSLCommerz configs)
+        console.warn(`[SSLCommerz] ⚠️ Using fallback method: appending cardname parameter`)
+        redirectUrl = `${gatewayUrl}${gatewayUrl.includes('?') ? '&' : '?'}cardname=${selectedGateway}`
+        console.log(`[SSLCommerz] Fallback URL: ${redirectUrl}`)
       } else {
         console.log(`[SSLCommerz] No specific gateway selected, using default gateway page`)
       }
 
       console.log(`[SSLCommerz] Redirecting to: ${redirectUrl}`)
+
+      // TEMPORARY: Alert to give time to check console logs
+      // Remove this after debugging production issue
+      alert(`⚠️ DEBUGGING: Check console logs now!\n\nSelected: ${selectedGateway || 'default'}\nGateway list length: ${gatewayList?.length || 0}\n\nClick OK to continue redirect...`)
 
       // Redirect to the selected gateway
       window.location.href = redirectUrl
